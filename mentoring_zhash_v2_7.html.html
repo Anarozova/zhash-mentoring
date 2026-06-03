@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentoring Zhash Pro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh}
+:root{--bg1:#fff;--bg2:#f1efe8;--blue:#185FA5;--blu:#E6F1FB;--bld:#0C447C;--t1:#1a1a18;--t2:#5f5e5a;--rm:8px;--rl:12px}
+.screen{display:none}.screen.active{display:block}
+.wrap{max-width:700px;margin:0 auto;padding:0 1.25rem 3rem}
+input,select{padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:var(--rm);background:var(--bg1);font-size:14px;color:var(--t1);outline:none;font-family:inherit}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(24,95,165,.12)}
+.btn{background:var(--blue);color:#fff;border:none;border-radius:var(--rm);padding:10px 20px;font-size:14px;cursor:pointer;font-weight:500}
+.btn:hover{background:var(--bld)}
+.btn-o{background:none;border:0.5px solid rgba(28,28,26,.25);border-radius:var(--rm);padding:7px 14px;font-size:13px;cursor:pointer;color:var(--t2)}
+.btn-o:hover{background:var(--bg2)}.btn-o.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;border-bottom:0.5px solid rgba(28,28,26,.12);margin-bottom:1.5rem}
+.ht{font-size:18px;font-weight:500}.hs{font-size:13px;color:var(--t2);margin-top:3px}
+.stitle{font-size:14px;font-weight:500;color:var(--t1);margin:1.5rem 0 .75rem}
+.ok{font-size:13px;color:#3B6D11;margin-top:8px;min-height:18px}
+.er{font-size:13px;color:#E24B4A;margin-top:6px;min-height:18px}
+.tabs{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap}
+.card{background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1.25rem;margin-bottom:1rem}
+.card h3{font-size:15px;font-weight:500;color:var(--t1);margin-bottom:1rem}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:480px){.frow{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:12px;color:var(--t2)}
+.fg input,.fg select{width:100%}
+.pill{display:inline-block;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;user-select:none}
+.pill:hover{opacity:.75}
+.pb-t{background:var(--bg2);border-radius:4px;height:10px;overflow:hidden;margin-top:5px}
+.pb-f{height:100%;border-radius:4px;transition:width .6s}
+.ig{display:grid;grid-template-columns:repeat(25,1fr);gap:2px;margin-bottom:1.5rem}
+@media(max-width:480px){.ig{grid-template-columns:repeat(10,1fr)}}
+.ic{aspect-ratio:1;border-radius:3px;border:0.5px solid rgba(28,28,26,.12);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--t2)}
+.ic.live{background:var(--blu);border-color:#85B7EB;color:var(--bld)}
+.pin-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid rgba(28,28,26,.08)}
+.pv{background:var(--bg2);padding:3px 10px;border-radius:4px;font-family:monospace;font-size:14px}
+.feed-item{background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem;margin-bottom:10px}
+.feed-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.feed-iter{font-size:12px;font-weight:500;color:var(--t2);background:var(--bg2);padding:2px 8px;border-radius:20px}
+.feed-total{font-size:18px;font-weight:500;color:var(--blue)}
+.feed-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.feed-cat{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
+.feed-cmt{font-size:13px;color:var(--t1);background:var(--bg2);border-radius:var(--rm);padding:8px 12px;border-left:3px solid var(--blue);line-height:1.5}
+.feed-no-cmt{font-size:12px;color:var(--t2);font-style:italic}
+.cat-section{margin-bottom:1.5rem}
+.cat-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.cat-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.cat-name-lbl{font-size:13px;font-weight:500;color:var(--t1)}
+.mentee-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.mentee-bar-name{font-size:12px;color:var(--t2);min-width:80px;text-align:right}
+.mentee-bar-track{flex:1;background:var(--bg2);border-radius:4px;height:18px;overflow:hidden;position:relative}
+.mentee-bar-fill{height:100%;border-radius:4px;transition:width .4s;position:relative}
+.mentee-bar-val{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:500;color:#fff;white-space:nowrap}
+.rank-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:1.5rem}
+.rank-card{background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem;display:flex;flex-direction:column;gap:6px}
+.rank-card.first{border-color:#BA7517;border-width:1.5px}
+.rank-medal{font-size:20px;line-height:1}
+.rank-cname{font-size:15px;font-weight:500}
+.rank-total{font-size:26px;font-weight:500;color:var(--blue);line-height:1}
+.rank-mini-bars{display:flex;flex-direction:column;gap:3px;margin-top:4px}
+.rank-mini-row{display:flex;align-items:center;gap:5px}
+.rank-mini-lbl{font-size:10px;color:var(--t2);min-width:22px}
+.rank-mini-track{flex:1;background:var(--bg2);border-radius:2px;height:5px;overflow:hidden}
+.rank-mini-fill{height:100%;border-radius:2px}
+.rank-mini-val{font-size:10px;color:var(--t2);min-width:16px;text-align:right}
+.rt-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#3B6D11;background:#EAF3DE;border-radius:20px;padding:3px 10px;font-weight:500}
+.rt-dot{width:7px;height:7px;border-radius:50%;background:#3B6D11;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.rt-badge.offline{color:var(--t2);background:var(--bg2)}
+.rt-badge.offline .rt-dot{background:var(--t2);animation:none}
+.toast{position:fixed;bottom:24px;right:24px;background:#185FA5;color:#fff;padding:12px 18px;border-radius:var(--rl);font-size:13px;font-weight:500;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:999;max-width:280px;line-height:1.4}
+.toast.show{opacity:1;transform:translateY(0)}
+@keyframes score-pop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+.score-pop{animation:score-pop .4s ease}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div id="s-login" class="screen active">
+<div class="wrap" style="max-width:380px">
+  <div style="margin:3rem 0 2rem">
+    <p style="font-size:26px;font-weight:500;margin-bottom:.4rem">Mentoring<br>Zhash Pro</p>
+    <p style="font-size:14px;color:var(--t2)">Введите имя и PIN-код для входа</p>
+  </div>
+  <div style="background:var(--bg2);border-radius:var(--rl);padding:1.25rem;margin-bottom:1.25rem">
+    <p style="font-size:12px;font-weight:500;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem">Ментор</p>
+    <div style="display:flex;gap:8px">
+      <input type="password" id="mpin" placeholder="PIN ментора" style="flex:1" maxlength="12">
+      <button class="btn" onclick="loginMentor()">Войти</button>
+    </div>
+    <div class="er" id="merr"></div>
+  </div>
+  <div style="background:var(--bg2);border-radius:var(--rl);padding:1.25rem">
+    <p style="font-size:12px;font-weight:500;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem">Менти</p>
+    <div class="fg" style="margin-bottom:10px">
+      <label>Выберите имя</label>
+      <select id="mentee-sel" onchange="onMenteeSelect()">
+        <option value="">— выберите —</option>
+        <option>Майрам</option><option>Бактияр</option><option>Насыят</option>
+        <option>Тынычбек</option><option>Азамат</option><option>Айкан</option><option>Сезим</option>
+      </select>
+    </div>
+    <div id="pinstep" style="display:none">
+      <div style="display:flex;gap:8px">
+        <input type="password" id="menteepin" placeholder="PIN-код" style="flex:1" maxlength="12">
+        <button class="btn" onclick="loginMentee()">Войти</button>
+      </div>
+      <div class="er" id="meerr"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MENTEE -->
+<div id="s-mentee" class="screen">
+<div class="wrap">
+  <div class="hdr">
+    <div><div class="ht" id="me-name"></div><div class="hs" id="me-sub"></div></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="rt-badge offline" id="me-rt-badge"><span class="rt-dot"></span><span id="me-rt-label">Подключение...</span></span>
+      <button class="btn-o" onclick="logout()">Выйти</button>
+    </div>
+  </div>
+  <div style="background:var(--blue);border-radius:var(--rl);padding:1.5rem;margin-bottom:1.5rem;text-align:center">
+    <p style="font-size:13px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Общий итог баллов</p>
+    <p style="font-size:60px;font-weight:500;color:#fff;line-height:1" id="me-big-tot">0</p>
+    <p style="font-size:13px;color:rgba(255,255,255,.6);margin-top:6px" id="me-max-hint">из 0 возможных</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs" style="margin-bottom:1.5rem">
+    <button class="btn-o on" onclick="meTab('progress',this)">📊 Прогресс</button>
+    <button class="btn-o" onclick="meTab('plan',this)">📋 Мой план</button>
+    <button class="btn-o" onclick="meTab('diag',this)">🔍 Диагностика</button>
+  </div>
+
+  <!-- Progress Tab -->
+  <div id="me-tab-progress">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem">
+    <div style="background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem">
+      <p style="font-size:12px;color:var(--t2);margin-bottom:4px">Посещаемость</p>
+      <p style="font-size:28px;font-weight:500;color:#185FA5" id="me-att">0</p>
+      <div class="pb-t"><div class="pb-f" id="pb-att" style="width:0%;background:#185FA5"></div></div>
+    </div>
+    <div style="background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem">
+      <p style="font-size:12px;color:var(--t2);margin-bottom:4px">Домашки</p>
+      <p style="font-size:28px;font-weight:500;color:#1D9E75" id="me-hw">0</p>
+      <div class="pb-t"><div class="pb-f" id="pb-hw" style="width:0%;background:#1D9E75"></div></div>
+    </div>
+    <div style="background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem">
+      <p style="font-size:12px;color:var(--t2);margin-bottom:4px">Активность</p>
+      <p style="font-size:28px;font-weight:500;color:#BA7517" id="me-act">0</p>
+      <div class="pb-t"><div class="pb-f" id="pb-act" style="width:0%;background:#BA7517"></div></div>
+    </div>
+    <div style="background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem">
+      <p style="font-size:12px;color:var(--t2);margin-bottom:4px">Результаты</p>
+      <p style="font-size:28px;font-weight:500;color:#993556" id="me-res">0</p>
+      <div class="pb-t"><div class="pb-f" id="pb-res" style="width:0%;background:#993556"></div></div>
+    </div>
+  </div>
+  <div style="background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem;margin-bottom:1.5rem">
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+      <span style="color:var(--t2)">Пройдено итераций</span><strong id="me-il">0 / 100</strong>
+    </div>
+    <div class="pb-t" style="height:12px"><div class="pb-f" id="me-pb" style="width:0%;background:var(--blue)"></div></div>
+  </div>
+  <div class="stitle">Мои итерации</div>
+  <div class="ig" id="me-ig"></div>
+  <div class="stitle">Рост баллов</div>
+  <div style="position:relative;width:100%;height:220px;margin-bottom:1.5rem"><canvas id="me-line"></canvas></div>
+  <div class="stitle">По категориям</div>
+  <div style="position:relative;width:100%;height:200px;margin-bottom:1.5rem"><canvas id="me-bar"></canvas></div>
+  <div class="stitle">Обратная связь от ментора</div>
+  <div id="me-feed"></div>
+  </div><!-- end progress tab -->
+
+  <!-- Plan Tab -->
+  <div id="me-tab-plan" style="display:none">
+    <div class="stitle">Мой план действий</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:1rem">Заполни свой план — ментор видит его в рабочем пространстве</div>
+    <div id="me-plan-rows"></div>
+    <div style="margin-bottom:1rem;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="addMyPlanRow()">+ Добавить строку</button>
+      <button class="btn-o" onclick="saveMyPlan()" id="me-plan-save-btn">💾 Сохранить план</button>
+      <span id="me-plan-ok" style="font-size:13px;color:#3B6D11;align-self:center"></span>
+    </div>
+  </div>
+
+  <!-- Diag Tab -->
+  <div id="me-tab-diag" style="display:none">
+    <div class="stitle">Диагностика бизнеса</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:1rem">Ответь на вопросы — ментор видит твои ответы</div>
+    <div id="me-diag-form"></div>
+    <div style="margin-top:1rem;display:flex;gap:8px">
+      <button class="btn" onclick="saveMyDiag()" id="me-diag-save-btn">💾 Сохранить ответы</button>
+      <span id="me-diag-ok" style="font-size:13px;color:#3B6D11;align-self:center"></span>
+    </div>
+  </div>
+
+  <div style="height:2rem"></div>
+</div>
+</div>
+
+<!-- MENTOR -->
+<div id="s-mentor" class="screen">
+<div class="wrap">
+  <div class="hdr">
+    <div><div class="ht">Панель ментора</div><div class="hs" id="tor-sub"></div></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="rt-badge" id="tor-rt"><span class="rt-dot"></span><span>Онлайн</span></span>
+      <button class="btn-o" onclick="logout()">Выйти</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem">
+    <div style="background:var(--bg2);border-radius:var(--rm);padding:12px;text-align:center"><p style="font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Сумма</p><p style="font-size:22px;font-weight:500;color:var(--blue)" id="tor-sum">0</p></div>
+    <div style="background:var(--bg2);border-radius:var(--rm);padding:12px;text-align:center"><p style="font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Лидер</p><p style="font-size:13px;font-weight:500;padding-top:4px" id="tor-lead">-</p></div>
+    <div style="background:var(--bg2);border-radius:var(--rm);padding:12px;text-align:center"><p style="font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Средний</p><p style="font-size:22px;font-weight:500" id="tor-avg">0</p></div>
+    <div style="background:var(--bg2);border-radius:var(--rm);padding:12px;text-align:center"><p style="font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Итераций</p><p style="font-size:22px;font-weight:500" id="tor-iters">0</p></div>
+  </div>
+  <div class="tabs">
+    <button class="btn-o on" onclick="mtab('viz',this)">Рейтинг</button>
+    <button class="btn-o" onclick="mtab('cat',this)">По категориям</button>
+    <button class="btn-o" onclick="mtab('dyn',this)">Динамика</button>
+    <button class="btn-o" onclick="mtab('add',this)">Добавить баллы</button>
+    <button class="btn-o" onclick="mtab('hist',this)">История</button>
+    <button class="btn-o" onclick="mtab('pins',this)">PIN-коды</button>
+  </div>
+  <div id="t-viz"><div class="stitle">Рейтинг</div><div class="rank-grid" id="rank-grid"></div></div>
+  <div id="t-cat" style="display:none"><div class="stitle">По категориям</div><div id="cat-breakdown"></div></div>
+  <div id="t-dyn" style="display:none"><div class="stitle">Динамика</div><div id="dyn-charts"></div></div>
+  <div id="t-add" style="display:none">
+    <div class="card">
+      <h3>Выставить баллы</h3>
+      <div class="frow">
+        <div class="fg"><label>Менти</label><select id="a-sel"><option>Майрам</option><option>Бактияр</option><option>Насыят</option><option>Тынычбек</option><option>Азамат</option><option>Айкан</option><option>Сезим</option></select></div>
+        <div class="fg"><label>Итерация №</label><input type="number" id="a-iter" min="1" max="100" value="1"></div>
+      </div>
+      <div style="background:var(--bg2);border-radius:var(--rm);padding:10px;margin-bottom:12px;font-size:13px;color:var(--t2)">От 0 до 5 по каждой категории</div>
+      <div class="frow">
+        <div class="fg"><label>Посещаемость</label><input type="number" id="a-att" min="0" max="5" value="0">
+          <div style="display:flex;gap:5px;margin-top:5px"><span class="pill" style="background:#E6F1FB;color:#0C447C" onclick="ss('a-att',1)">1</span><span class="pill" style="background:#E6F1FB;color:#0C447C" onclick="ss('a-att',2)">2</span><span class="pill" style="background:#EAF3DE;color:#27500A" onclick="ss('a-att',3)">3</span><span class="pill" style="background:#EAF3DE;color:#27500A" onclick="ss('a-att',4)">4</span><span class="pill" style="background:#FAEEDA;color:#633806" onclick="ss('a-att',5)">5</span></div>
+        </div>
+        <div class="fg"><label>Домашки</label><input type="number" id="a-hw" min="0" max="5" value="0">
+          <div style="display:flex;gap:5px;margin-top:5px"><span class="pill" style="background:#E6F1FB;color:#0C447C" onclick="ss('a-hw',1)">1</span><span class="pill" style="background:#E6F1FB;color:#0C447C" onclick="ss('a-hw',2)">2</span><span class="pill" style="background:#EAF3DE;color:#27500A" onclick="ss('a-hw',3)">3</span><span class="pill" style="background:#EAF3DE;color:#27500A" onclick="ss('a-hw',4)">4</span><span class="pill" style="background:#FAEEDA;color:#633806" onclick="ss('a-hw',5)">5</span></div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Активность</label><input type="number" id="a-act" min="0" max="5" value="0">
+          <div style="display:flex;gap:5px;margin-top:5px"><span class="pill" style="background:#E6F1FB;color:#0C447C" onclick="ss('a-act',1)">1</span><span class="pill" style="background:#E6F1FB;color:#0C447C" onclick="ss('a-act',2)">2</span><span class="pill" style="background:#EAF3DE;color:#27500A" onclick="ss('a-act',3)">3</span><span class="pill" style="background:#EAF3DE;color:#27500A" onclick="ss('a-act',4)">4</span><span class="pill" style="background:#FAEEDA;color:#633806" onclick="ss('a-act',5)">5</span></div>
+        </div>
+        <div class="fg"><label>Результаты</label><input type="number" id="a-res" min="0" max="5" value="0">
+          <div style="display:flex;gap:5px;margin-top:5px"><span class="pill" style="background:#E6F1FB;color:#0C447C" onclick="ss('a-res',1)">1</span><span class="pill" style="background:#E6F1FB;color:#0C447C" onclick="ss('a-res',2)">2</span><span class="pill" style="background:#EAF3DE;color:#27500A" onclick="ss('a-res',3)">3</span><span class="pill" style="background:#EAF3DE;color:#27500A" onclick="ss('a-res',4)">4</span><span class="pill" style="background:#FAEEDA;color:#633806" onclick="ss('a-res',5)">5</span></div>
+        </div>
+      </div>
+      <div class="fg" style="margin-top:6px"><label>Комментарий</label><input type="text" id="a-cmt" placeholder="Молодец!"></div>
+      <div style="background:var(--bg2);border-radius:var(--rm);padding:10px;margin-top:12px;font-size:14px">Итого: <strong id="prev" style="color:var(--blue)">0</strong> из 20</div>
+      <button class="btn" style="margin-top:12px;width:100%" onclick="saveScore()">💾 Сохранить</button>
+      <div class="ok" id="a-ok"></div>
+    </div>
+  </div>
+  <div id="t-hist" style="display:none">
+    <div class="card"><h3>История</h3><div class="fg" style="margin-bottom:1rem"><label>Менти</label><select id="hist-sel" onchange="renderHist()"><option>Майрам</option><option>Бактияр</option><option>Насыят</option><option>Тынычбек</option><option>Азамат</option><option>Айкан</option><option>Сезим</option></select></div><div id="hist-body"></div></div>
+  </div>
+  <div id="t-pins" style="display:none">
+    <div class="card">
+      <h3>PIN-коды менти</h3>
+      <div id="pins-list"></div>
+      <div style="margin-top:1.25rem;padding-top:1rem;border-top:0.5px solid rgba(28,28,26,.1)">
+        <p style="font-size:13px;color:var(--t2);margin-bottom:8px">PIN ментора: <code id="cur-mpin" style="background:var(--bg2);padding:1px 6px;border-radius:4px">zhash24</code></p>
+        <div style="display:flex;gap:8px"><input type="password" id="np" placeholder="Новый PIN (мин. 4 знака)" style="flex:1" maxlength="12"><button class="btn" onclick="changeMPin()">Сохранить</button></div>
+        <div class="ok" id="pin-ok"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const FB = 'https://zhash-pro-default-rtdb.europe-west1.firebasedatabase.app';
+const MENTEES = ['Майрам','Бактияр','Насыят','Тынычбек','Азамат','Айкан','Сезим'];
+const CATS = ['Посещаемость','Домашки','Активность','Результаты'];
+const CKEYS = ['att','hw','act','res'];
+const CCOL = ['#185FA5','#1D9E75','#BA7517','#993556'];
+const MCOL = ['#185FA5','#1D9E75','#D85A30','#7F77DD','#BA7517','#993556','#0F6E56'];
+const MAX = 500;
+const DEFAULT_PINS = {'Майрам':'zvezda','Бактияр':'aqikat','Насыят':'julduz','Тынычбек':'kairat','Азамат':'nooruz','Айкан':'albek','Сезим':'sandyk'};
+
+let scores={}, pins={...DEFAULT_PINS}, mentorPin='zhash24';
+let selMentee=null, charts={}, pollTimer=null, currentRole=null;
+let myPlan=[], myDiagAnswers={};
+
+const DIAG_QUESTIONS=[
+  {section:'В чём социальность предприятия?',questions:[
+    'В чём социальность вашего предприятия? Какую социальную проблему решает бизнес?'
+  ]},
+  {section:'Краткая информация о компании',questions:[
+    'Расскажите кратко о компании — предыстория, как начинался бизнес?'
+  ]},
+  {section:'Продукт',questions:[
+    '1. Какую проблему решает продукт (услуга)? Расскажите о продукте.',
+    '2. Кому продаёте продукт (услугу)? Кто целевая аудитория? Какая география клиентов?',
+    '3. Какой средний чек и как устроено ценообразование?',
+    '4. Знаете ли своё ценностное предложение, УТП, конкурентное преимущество?',
+    '5. Какие основные показатели в бизнесе (выручка, прибыль и др.)? Имеются ли данные за последний месяц/год?',
+    '6. Какие услуги/продукты в разработке или в планах? Как часто появляются новые продукты?',
+    '7. Есть ли у компании/собственника права на интеллектуальную собственность?'
+  ]},
+  {section:'Маркетинг и продажи',questions:[
+    '1. Через какие каналы привлекаете клиентов сейчас?',
+    '2. Какие каналы продаж уже проверили? Какой основной на данный момент?',
+    '3. Сколько тратите на привлечение клиентов?',
+    '4. Сколько клиентов в топовый месяц?',
+    '5. Сколько клиентов в год?',
+    '6. Расскажите про конкретного самого удовлетворённого/желанного клиента — что знаете про своих клиентов?'
+  ]},
+  {section:'Команда',questions:[
+    '1. Кто есть в команде? Распределение ролей? Кто главный?',
+    '2. Сколько учредителей и каковы доли компании?',
+    '3. Работает ли CEO над проектом фулл-тайм?',
+    '4. Сколько часов в день готовы уделять продукту (если не фулл-тайм)?',
+    '5. Каких компетенций не хватает в команде?',
+    '6. Есть ли в команде инвестор? Какую роль играет? Является ли его решение блокирующим или критичным?'
+  ]},
+  {section:'Финансы',questions:[
+    '1. Какова форма регистрации, тип социального предприятия?',
+    '2. Ведётся ли вся необходимая бухгалтерская документация? Сдаются ли отчёты?',
+    '3. Имеется ли отчёт о прибылях и убытках?'
+  ]},
+  {section:'Мотивация и цели',questions:[
+    '1. Какие цели на 2026 год?',
+    '2. Есть ли стратегия развития и на какой срок?',
+    '3. Зачем делаете этот бизнес — ваша мотивация?',
+    '4. Есть ли запрос на инвестиции и в каком размере?',
+    '5. Сколько денег уже потрачено на этот бизнес?',
+    '6. Как долго занимаетесь этим продуктом/услугой?',
+    '7. Сколько денег уходит на проект в месяц?',
+    '8. Есть ли другой бизнес в приоритете, из-за которого можете бросить этот?',
+    '9. Исходя из ответов выше — сформулируйте вашу ЦЕЛЬ НА ТРЕКШН. Почему такая цель?'
+  ]},
+  {section:'Итоговые вопросы',questions:[
+    '1. Какие барьеры на пути развития бизнеса видите?',
+    '2. Как пробовали ранее эти барьеры преодолевать?',
+    '3. Имеются ли проблемы, связанные с экологией? Нет ли негативного воздействия?',
+    '4. Что действительно может помочь расти и преодолеть препятствия?'
+  ]}
+];
+
+function meTab(tab,btn){
+  document.querySelectorAll('.tabs .btn-o').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('me-tab-progress').style.display=tab==='progress'?'block':'none';
+  document.getElementById('me-tab-plan').style.display=tab==='plan'?'block':'none';
+  document.getElementById('me-tab-diag').style.display=tab==='diag'?'block':'none';
+  if(tab==='diag')renderMyDiagForm();
+}
+
+function renderMyDiagForm(){
+  if(!selMentee)return;
+  // Load existing answers from Firebase
+  fetch(FB+'/data/mdetails/'+encodeURIComponent(selMentee)+'/diagAnswers.json?t='+Date.now())
+    .then(r=>r.ok?r.json():null)
+    .then(ans=>{
+      myDiagAnswers=ans||{};
+      buildDiagForm();
+    }).catch(()=>{myDiagAnswers={};buildDiagForm();});
+}
+
+function buildDiagForm(){
+  const el=document.getElementById('me-diag-form');
+  if(!el)return;
+  el.innerHTML=DIAG_QUESTIONS.map(s=>`
+    <div style="margin-bottom:1.5rem">
+      <div style="font-size:12px;font-weight:500;color:var(--blue);text-transform:uppercase;letter-spacing:.04em;padding:8px 12px;background:var(--blu);border-radius:var(--rm);margin-bottom:10px">${s.section}</div>
+      ${s.questions.map((q,qi)=>{
+        const key=s.section+'_'+qi;
+        return `<div style="margin-bottom:10px">
+          <div style="font-size:13px;color:var(--t1);margin-bottom:6px;font-weight:500">${q}</div>
+          <textarea rows="3" placeholder="Ваш ответ..."
+            style="width:100%;padding:10px 12px;border:0.5px solid rgba(28,28,26,.25);border-radius:var(--rm);font-size:14px;font-family:inherit;resize:vertical;background:#fff"
+            oninput="myDiagAnswers['${key}']=this.value">${myDiagAnswers[key]||''}</textarea>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+async function saveMyDiag(){
+  if(!selMentee)return;
+  const btn=document.getElementById('me-diag-save-btn');
+  const ok=document.getElementById('me-diag-ok');
+  btn.textContent='⏳ Сохраняем...';
+  try{
+    const r=await fetch(FB+'/data/mdetails/'+encodeURIComponent(selMentee)+'/diagAnswers.json',{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(myDiagAnswers)
+    });
+    ok.textContent=r.ok?'✓ Ответы сохранены! Ментор видит их.':'Ошибка сохранения';
+    ok.style.color=r.ok?'#3B6D11':'#E24B4A';
+  }catch(e){
+    ok.textContent='Нет соединения';
+    ok.style.color='#E24B4A';
+  }
+  setTimeout(()=>ok.textContent='',3000);
+  btn.textContent='💾 Сохранить ответы';
+}
+
+function showToast(msg,dur=3500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+
+// ---- Firebase fetch (простой REST без SSE) ----
+async function fbGet(path){
+  try{
+    const r=await fetch(FB+path+'.json?t='+Date.now());
+    if(r.ok){const d=await r.json();return d;}
+  }catch(e){}
+  return null;
+}
+async function fbSet(path,data){
+  try{
+    const r=await fetch(FB+path+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    return r.ok;
+  }catch(e){return false;}
+}
+
+// ---- Polling каждые 3 сек ----
+function startPoll(){
+  stopPoll();
+  pollTimer=setInterval(async()=>{
+    const fresh=await fbGet('/scores');
+    if(fresh!==null){
+      const prevTot=currentRole==='mentee'&&selMentee?totals(selMentee).total:0;
+      scores=fixScores(fresh||{});
+      if(currentRole==='mentee'&&selMentee){
+        const newTot=totals(selMentee).total;
+        renderMentee(selMentee);
+        setBadge(true);
+        if(newTot>prevTot){
+          showToast('🎉 Ментор выставил +'+(newTot-prevTot)+' баллов!');
+          const el=document.getElementById('me-big-tot');
+          el.classList.remove('score-pop');void el.offsetWidth;el.classList.add('score-pop');
+        }
+      }
+      if(currentRole==='mentor')refreshMentor();
+    }else{
+      if(currentRole==='mentee')setBadge(false);
+    }
+  },3000);
+}
+function stopPoll(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}}
+
+function setBadge(online){
+  const b=document.getElementById('me-rt-badge');
+  const l=document.getElementById('me-rt-label');
+  if(!b)return;
+  if(online){b.classList.remove('offline');l.textContent='Обновляется в реальном времени';}
+  else{b.classList.add('offline');l.textContent='Нет соединения';}
+}
+
+// ---- INIT ----
+function init(){
+  // Сразу показываем логин с дефолтными PIN-ами
+  sw('s-login');
+  // Загружаем из localStorage
+  try{scores=JSON.parse(localStorage.getItem('zs')||'{}');}catch{}
+  try{pins=JSON.parse(localStorage.getItem('zp')||JSON.stringify(DEFAULT_PINS));}catch{}
+  try{mentorPin=localStorage.getItem('zm')||'zhash24';}catch{}
+  // Firebase грузим в фоне — не блокируем вход
+  Promise.all([fbGet('/scores'),fbGet('/pins'),fbGet('/mentorPin')])
+    .then(([sc,pi,mp])=>{
+      if(sc)scores=fixScores(sc);
+      if(pi)pins=pi;
+      if(mp)mentorPin=mp;
+    }).catch(()=>{});
+}
+
+function fixScores(sc){
+  // Firebase иногда сохраняет как массив — конвертируем в объект
+  const out={};
+  Object.keys(sc||{}).forEach(name=>{
+    const d=sc[name];
+    if(Array.isArray(d)){
+      const obj={};
+      d.forEach((v,i)=>{if(v&&i>0)obj[i]=v;});
+      out[name]=obj;
+    } else {
+      out[name]=d||{};
+    }
+  });
+  return out;
+}
+function totals(name){const d=scores[name]||{};let att=0,hw=0,act=0,res=0;Object.values(d).forEach(v=>{if(v){att+=v.att||0;hw+=v.hw||0;act+=v.act||0;res+=v.res||0;}});return{att,hw,act,res,total:att+hw+act+res};}
+function iterCount(name){return Object.keys(scores[name]||{}).length;}
+
+function onMenteeSelect(){const name=document.getElementById('mentee-sel').value;if(!name){document.getElementById('pinstep').style.display='none';return;}selMentee=name;document.getElementById('pinstep').style.display='block';document.getElementById('menteepin').value='';document.getElementById('meerr').textContent='';document.getElementById('menteepin').focus();}
+function loginMentor(){if(document.getElementById('mpin').value===mentorPin)showMentor();else document.getElementById('merr').textContent='Неверный PIN';}
+function loginMentee(){if(!selMentee){document.getElementById('meerr').textContent='Выберите имя';return;}if(pins[selMentee]===document.getElementById('menteepin').value)showMentee(selMentee);else document.getElementById('meerr').textContent='Неверный PIN';}
+function logout(){currentRole=null;selMentee=null;stopPoll();Object.values(charts).forEach(c=>{try{c.destroy();}catch{}});charts={};document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s-login').classList.add('active');document.getElementById('mpin').value='';document.getElementById('merr').textContent='';document.getElementById('meerr').textContent='';document.getElementById('mentee-sel').value='';document.getElementById('pinstep').style.display='none';}
+function sw(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function showMentee(name){currentRole='mentee';selMentee=name;sw('s-mentee');setBadge(false);renderMentee(name);startPoll();}
+
+function renderMentee(name){
+  const t=totals(name);const ic=iterCount(name);const maxP=ic*20;
+  document.getElementById('me-name').textContent=name;
+  document.getElementById('me-sub').textContent='Итераций: '+ic+' из '+MAX;
+  document.getElementById('me-big-tot').textContent=t.total;
+  document.getElementById('me-max-hint').textContent='из '+maxP+' возможных';
+  document.getElementById('me-att').textContent=t.att;
+  document.getElementById('me-hw').textContent=t.hw;
+  document.getElementById('me-act').textContent=t.act;
+  document.getElementById('me-res').textContent=t.res;
+  const mc=ic*5||1;
+  document.getElementById('pb-att').style.width=Math.round(t.att/mc*100)+'%';
+  document.getElementById('pb-hw').style.width=Math.round(t.hw/mc*100)+'%';
+  document.getElementById('pb-act').style.width=Math.round(t.act/mc*100)+'%';
+  document.getElementById('pb-res').style.width=Math.round(t.res/mc*100)+'%';
+  document.getElementById('me-il').textContent=ic+' / '+MAX;
+  document.getElementById('me-pb').style.width=Math.round(ic/MAX*100)+'%';
+  const ig=document.getElementById('me-ig');ig.innerHTML='';
+  for(let i=1;i<=MAX;i++){const c=document.createElement('div');c.className='ic';c.textContent=i;if((scores[name]||{})[i])c.classList.add('live');ig.appendChild(c);}
+  const iters=Object.keys(scores[name]||{}).map(Number).sort((a,b)=>a-b);
+  let cum=0;const cumData=iters.map(i=>{const d=(scores[name]||{})[i];cum+=(d.att||0)+(d.hw||0)+(d.act||0)+(d.res||0);return cum;});
+  if(charts['ml'])charts['ml'].destroy();
+  const cl=document.getElementById('me-line');
+  if(cl)charts['ml']=new Chart(cl,{type:'line',data:{labels:iters.map(i=>'#'+i),datasets:[{label:'Итого',data:cumData,borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,.1)',fill:true,pointBackgroundColor:'#185FA5',pointRadius:iters.length>20?2:4,tension:.35,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#888',maxTicksLimit:12}},y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#888'}}}}});
+  if(charts['mb'])charts['mb'].destroy();
+  const cb=document.getElementById('me-bar');
+  if(cb)charts['mb']=new Chart(cb,{type:'bar',data:{labels:CATS,datasets:[{label:'Баллов',data:[t.att,t.hw,t.act,t.res],backgroundColor:CCOL,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#888'}},x:{grid:{display:false},ticks:{color:'#888'}}}}});
+  renderFeed(name);
+  renderActionPlan(name);
+}
+
+function renderActionPlan(name){
+  const el=document.getElementById('me-action-plan');
+  if(!el)return;
+  // Load from Firebase
+  fetch(FB+'/data/mdetails/'+encodeURIComponent(name)+'/actionPlan.json?t='+Date.now())
+    .then(r=>r.ok?r.json():null)
+    .then(plan=>{
+      myPlan=plan&&plan.length?plan:[];
+      renderMyPlanTable();
+    })
+    .catch(()=>{myPlan=[];renderMyPlanTable();});
+}
+
+let planRowCount=0;
+
+function addMyPlanRow(){
+  document.getElementById('me-tab-progress').style.display='none';
+  document.getElementById('me-tab-plan').style.display='block';
+  document.getElementById('me-tab-diag').style.display='none';
+  document.querySelectorAll('.tabs .btn-o').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tabs .btn-o')[1]?.classList.add('on');
+  const i=planRowCount++;
+  const row=document.createElement('div');
+  row.id='plan-row-'+i;
+  row.style.cssText='background:#fff;border:0.5px solid rgba(28,28,26,.12);border-radius:12px;padding:1rem;margin-bottom:10px';
+  row.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:10px">
+    <span style="font-size:12px;font-weight:500;color:#5f5e5a">Строка ${i+1}</span>
+    <button onclick="document.getElementById('plan-row-${i}').remove()" style="background:none;border:none;color:#E24B4A;cursor:pointer">✕ Удалить</button>
+  </div>
+  <div style="margin-bottom:8px"><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Деятельность</label>
+    <input type="text" name="act-${i}" placeholder="Что буду делать..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
+  <div style="margin-bottom:8px"><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Индикатор</label>
+    <input type="text" name="ind-${i}" placeholder="Как измерю результат..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Бюджет/Ресурсы</label>
+      <input type="text" name="bud-${i}" placeholder="Ресурсы..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
+    <div><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Срок</label>
+      <input type="text" name="dead-${i}" placeholder="Когда..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
+  </div>`;
+  document.getElementById('me-plan-rows').appendChild(row);
+}
+
+function renderMyPlanTable(){
+  // Load existing plan rows
+  const container=document.getElementById('me-plan-rows');
+  if(!container)return;
+  container.innerHTML='';
+  planRowCount=0;
+  if(!myPlan||!myPlan.length)return;
+  myPlan.forEach((row,i)=>{
+    const div=document.createElement('div');
+    div.id='plan-row-'+i;
+    div.style.cssText='background:#fff;border:0.5px solid rgba(28,28,26,.12);border-radius:12px;padding:1rem;margin-bottom:10px';
+    div.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:12px;font-weight:500;color:#5f5e5a">Строка ${i+1}</span>
+      <button onclick="document.getElementById('plan-row-${i}').remove()" style="background:none;border:none;color:#E24B4A;cursor:pointer">✕ Удалить</button>
+    </div>
+    <div style="margin-bottom:8px"><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Деятельность</label>
+      <input type="text" name="act-${i}" value="${(row.activity||'').replace(/"/g,'&quot;')}" placeholder="Что буду делать..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
+    <div style="margin-bottom:8px"><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Индикатор</label>
+      <input type="text" name="ind-${i}" value="${(row.indicator||'').replace(/"/g,'&quot;')}" placeholder="Как измерю результат..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Бюджет/Ресурсы</label>
+        <input type="text" name="bud-${i}" value="${(row.budget||'').replace(/"/g,'&quot;')}" placeholder="Ресурсы..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
+      <div><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Срок</label>
+        <input type="text" name="dead-${i}" value="${(row.deadline||'').replace(/"/g,'&quot;')}" placeholder="Когда..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
+    </div>`;
+    container.appendChild(div);
+    planRowCount=i+1;
+  });
+}
+
+async function saveMyPlan(){
+  if(!selMentee)return;
+  // Collect all rows from DOM
+  const collected=[];
+  const container=document.getElementById('me-plan-rows');
+  if(container){
+    const rows=container.querySelectorAll('[id^="plan-row-"]');
+    rows.forEach(row=>{
+      collected.push({
+        activity:row.querySelector('[name^="act"]')?.value||'',
+        indicator:row.querySelector('[name^="ind"]')?.value||'',
+        budget:row.querySelector('[name^="bud"]')?.value||'',
+        deadline:row.querySelector('[name^="dead"]')?.value||''
+      });
+    });
+  }
+  myPlan=collected;
+  const btn=document.getElementById('me-plan-save-btn');
+  const ok=document.getElementById('me-plan-ok');
+  btn.textContent='⏳ Сохраняем...';
+  try{
+    const r=await fetch(FB+'/data/mdetails/'+encodeURIComponent(selMentee)+'/actionPlan.json',{
+      method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(myPlan)
+    });
+    ok.textContent=r.ok?'✓ Сохранено! Ментор видит.':'Ошибка';
+    ok.style.color=r.ok?'#3B6D11':'#E24B4A';
+  }catch(e){
+    localStorage.setItem('myPlan_'+selMentee,JSON.stringify(myPlan));
+    ok.textContent='✓ Сохранено локально';
+    ok.style.color='#3B6D11';
+  }
+  setTimeout(()=>ok.textContent='',3000);
+  btn.textContent='💾 Сохранить план';
+}
+
+function renderFeed(name){
+  const d=scores[name]||{};const iters=Object.keys(d).map(Number).sort((a,b)=>b-a);
+  const el=document.getElementById('me-feed');
+  if(!iters.length){el.innerHTML='<div style="font-size:13px;color:var(--t2);padding:12px;background:var(--bg2);border-radius:var(--rm);text-align:center">Баллов пока нет — скоро появятся! 🌟</div>';return;}
+  const cc=['#E6F1FB','#EAF3DE','#FAEEDA','#FBEAF0'];const ct=['#0C447C','#27500A','#633806','#72243E'];
+  el.innerHTML=iters.map(i=>{const r=d[i];const s=(r.att||0)+(r.hw||0)+(r.act||0)+(r.res||0);const cp=CATS.map((c,ci)=>{const v=[r.att||0,r.hw||0,r.act||0,r.res||0][ci];if(!v)return '';return '<span class="feed-cat" style="background:'+cc[ci]+';color:'+ct[ci]+'">'+c+': '+v+'</span>';}).filter(Boolean).join('');return '<div class="feed-item"><div class="feed-top"><span class="feed-iter">Итерация #'+i+'</span><span class="feed-total">+'+s+' баллов</span></div><div class="feed-cats">'+cp+'</div>'+(r.cmt?'<div class="feed-cmt">"'+r.cmt+'"</div>':'<div class="feed-no-cmt">Комментарий не добавлен</div>')+'</div>';}).join('');
+}
+
+function showMentor(){currentRole='mentor';sw('s-mentor');document.getElementById('tor-sub').textContent=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});refreshMentor();buildAddForm();buildHistSel();buildPins();}
+
+function refreshMentor(){
+  const all=MENTEES.map(m=>({name:m,...totals(m),ic:iterCount(m)}));
+  const sum=all.reduce((a,b)=>a+b.total,0);const top=all.reduce((a,b)=>a.total>b.total?a:b);
+  document.getElementById('tor-sum').textContent=sum;
+  document.getElementById('tor-lead').textContent=top.name+': '+top.total;
+  document.getElementById('tor-avg').textContent=Math.round(sum/MENTEES.length);
+  document.getElementById('tor-iters').textContent=all.reduce((a,b)=>a+b.ic,0);
+  buildRankCards(all);buildCatBreakdown(all);
+}
+
+function buildRankCards(all){
+  const sorted=[...all].sort((a,b)=>b.total-a.total);
+  const medals=['🥇','🥈','🥉','4','5','6','7'];
+  const catMax=Math.max(...all.map(x=>Math.max(x.att,x.hw,x.act,x.res,1)));
+  document.getElementById('rank-grid').innerHTML=sorted.map((x,i)=>{
+    const mi=MENTEES.indexOf(x.name);const col=MCOL[mi];const catVals=[x.att,x.hw,x.act,x.res];
+    const miniRows=CATS.map((c,ci)=>'<div class="rank-mini-row"><span class="rank-mini-lbl" style="color:'+CCOL[ci]+'">'+c.substring(0,3)+'.</span><div class="rank-mini-track"><div class="rank-mini-fill" style="width:'+Math.round(catVals[ci]/catMax*100)+'%;background:'+CCOL[ci]+'"></div></div><span class="rank-mini-val">'+catVals[ci]+'</span></div>').join('');
+    return '<div class="rank-card'+(i===0?' first':'')+'"><div class="rank-medal">'+medals[i]+'</div><div class="rank-cname" style="color:'+col+'">'+x.name+'</div><div class="rank-total">'+x.total+'</div><div style="font-size:11px;color:var(--t2);margin-top:-4px">'+x.ic+' итераций</div><div class="rank-mini-bars">'+miniRows+'</div></div>';
+  }).join('');
+}
+
+function buildCatBreakdown(all){
+  const maxPerCat=CKEYS.map(k=>Math.max(...all.map(x=>x[k]),1));
+  const sorted=[...all].sort((a,b)=>b.total-a.total);
+  document.getElementById('cat-breakdown').innerHTML=CATS.map((cat,ci)=>{
+    const key=CKEYS[ci];const col=CCOL[ci];const mx=maxPerCat[ci];
+    const rows=sorted.map(x=>{const v=x[key];const pct=Math.round(v/mx*100);const si=pct>25;return '<div class="mentee-bar-row"><span class="mentee-bar-name">'+x.name+'</span><div class="mentee-bar-track"><div class="mentee-bar-fill" style="width:'+pct+'%;background:'+col+'">'+(si?'<span class="mentee-bar-val">'+v+'</span>':'')+'</div>'+(si?'':'<span style="font-size:12px;color:var(--t2);position:absolute;left:'+(pct+1)+'%;top:50%;transform:translateY(-50%)">'+v+'</span>')+'</div></div>';}).join('');
+    return '<div class="cat-section"><div class="cat-header"><div class="cat-dot" style="background:'+col+'"></div><span class="cat-name-lbl">'+cat+'</span><span style="font-size:12px;color:var(--t2);margin-left:auto">макс: '+mx+'</span></div>'+rows+'</div>';
+  }).join('');
+}
+
+function buildDynCharts(){
+  const el=document.getElementById('dyn-charts');
+  Object.keys(charts).filter(k=>k.startsWith('d')).forEach(k=>{try{charts[k].destroy();}catch{}delete charts[k];});
+  const allIters=[...new Set(MENTEES.flatMap(m=>Object.keys(scores[m]||{}).map(Number)))].sort((a,b)=>a-b);
+  if(!allIters.length){el.innerHTML='<p style="font-size:13px;color:var(--t2)">Баллов ещё нет</p>';return;}
+  el.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+MENTEES.map((m,mi)=>'<div style="background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;font-weight:500;color:'+MCOL[mi]+'">'+m+'</span><span style="font-size:18px;font-weight:500">'+totals(m).total+'</span></div><div style="position:relative;height:80px"><canvas id="d'+mi+'"></canvas></div></div>').join('')+'</div>';
+  MENTEES.forEach((m,mi)=>{let cum=0;const data=allIters.map(d=>{const dd=(scores[m]||{})[d];if(dd)cum+=(dd.att||0)+(dd.hw||0)+(dd.act||0)+(dd.res||0);return cum;});const cv=document.getElementById('d'+mi);if(cv)charts['d'+mi]=new Chart(cv,{type:'line',data:{labels:allIters.map(d=>'#'+d),datasets:[{data,borderColor:MCOL[mi],backgroundColor:MCOL[mi]+'22',fill:true,pointRadius:0,tension:.4,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:true,beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#aaa',font:{size:9},maxTicksLimit:4}}}}});});
+}
+
+function ss(id,v){document.getElementById(id).value=v;updPrev();}
+function updPrev(){const v=['a-att','a-hw','a-act','a-res'].reduce((s,id)=>s+(parseInt(document.getElementById(id).value)||0),0);document.getElementById('prev').textContent=v;}
+function buildAddForm(){document.getElementById("a-sel").innerHTML=MENTEES.map(m=>"<option>"+m+"</option>").join("");const mi=Math.max(1,...MENTEES.flatMap(m=>Object.keys(scores[m]||{}).map(Number)));document.getElementById("a-iter").value=Math.min(mi,MAX);}
+
+async function saveScore(){
+  const name=document.getElementById('a-sel').value;
+  const iter=Math.min(MAX,Math.max(1,parseInt(document.getElementById('a-iter').value)||1));
+  const att=Math.min(5,Math.max(0,parseInt(document.getElementById('a-att').value)||0));
+  const hw=Math.min(5,Math.max(0,parseInt(document.getElementById('a-hw').value)||0));
+  const act=Math.min(5,Math.max(0,parseInt(document.getElementById('a-act').value)||0));
+  const res=Math.min(5,Math.max(0,parseInt(document.getElementById('a-res').value)||0));
+  const cmt=document.getElementById('a-cmt').value;
+  if(!scores[name])scores[name]={};
+  scores[name][iter]={att,hw,act,res,cmt};
+  const statusEl=document.getElementById('a-ok');
+  const total=att+hw+act+res;
+  statusEl.textContent='✓ '+name+' #'+iter+': +'+total+' → итого '+totals(name).total+'. Менти увидят через ~3 сек!';
+  localStorage.setItem('zs',JSON.stringify(scores));
+  fbSet('/scores',scores);
+  setTimeout(()=>statusEl.textContent='',5000);
+  ['a-att','a-hw','a-act','a-res'].forEach(id=>document.getElementById(id).value=0);
+  document.getElementById('a-cmt').value='';document.getElementById('prev').textContent=0;
+  document.getElementById('a-iter').value=Math.min(iter+1,MAX);
+  refreshMentor();
+}
+
+function buildHistSel(){document.getElementById('hist-sel').innerHTML=MENTEES.map(m=>'<option>'+m+'</option>').join('');renderHist();}
+function renderHist(){
+  const name=document.getElementById('hist-sel').value;const d=scores[name]||{};
+  const iters=Object.keys(d).map(Number).sort((a,b)=>a-b);const el=document.getElementById('hist-body');
+  if(!iters.length){el.innerHTML='<p style="font-size:13px;color:var(--t2)">Итераций ещё нет</p>';return;}
+  const t=totals(name);
+  let html='<div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap"><div style="background:var(--bg2);border-radius:var(--rm);padding:10px;flex:1;min-width:80px;text-align:center"><div style="font-size:11px;color:var(--t2);margin-bottom:3px">ИТОГО</div><div style="font-size:20px;font-weight:500;color:var(--blue)">'+t.total+'</div></div><div style="background:var(--bg2);border-radius:var(--rm);padding:10px;flex:1;min-width:80px;text-align:center"><div style="font-size:11px;color:var(--t2);margin-bottom:3px">ИТЕРАЦИЙ</div><div style="font-size:20px;font-weight:500">'+iters.length+'</div></div><div style="background:var(--bg2);border-radius:var(--rm);padding:10px;flex:1;min-width:80px;text-align:center"><div style="font-size:11px;color:var(--t2);margin-bottom:3px">СРЕДНЕЕ</div><div style="font-size:20px;font-weight:500">'+(iters.length?(t.total/iters.length).toFixed(1):0)+'</div></div></div><div style="display:flex;flex-direction:column;gap:8px">';
+  iters.forEach(i=>{const r=d[i];const s=(r.att||0)+(r.hw||0)+(r.act||0)+(r.res||0);html+='<div id="row-'+i+'" style="background:var(--bg1);border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;font-weight:500;color:var(--t2);background:var(--bg2);padding:2px 10px;border-radius:20px">Итерация #'+i+'</span><div style="display:flex;align-items:center;gap:6px"><span style="font-size:20px;font-weight:500;color:var(--blue)">'+s+'</span><button class="btn-o" style="font-size:12px;padding:4px 10px" onclick="editIter(\''+name+'\','+i+')">Изменить</button><button class="btn-o" style="font-size:12px;padding:4px 10px;color:#E24B4A;border-color:rgba(226,75,74,.3)" onclick="deleteIter(\''+name+'\','+i+')">Удалить</button></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'+CATS.map((c,ci)=>{const v=[r.att||0,r.hw||0,r.act||0,r.res||0][ci];return '<span style="font-size:12px;padding:3px 10px;border-radius:20px;font-weight:500;background:'+['#E6F1FB','#EAF3DE','#FAEEDA','#FBEAF0'][ci]+';color:'+['#0C447C','#27500A','#633806','#72243E'][ci]+'">'+c+': '+v+'</span>';}).join('')+'</div>'+(r.cmt?'<div style="font-size:13px;color:var(--t1);background:var(--bg2);border-radius:var(--rm);padding:8px 12px;border-left:3px solid var(--blue);line-height:1.5">"'+r.cmt+'"</div>':'<div style="font-size:12px;color:var(--t2);font-style:italic">Комментарий не добавлен</div>')+'</div>';});
+  el.innerHTML=html+'</div>';
+}
+function editIter(name,iter){const r=(scores[name]||{})[iter];if(!r)return;const row=document.getElementById('row-'+iter);row.style.background='#FFFBF0';row.style.borderColor='#BA7517';row.innerHTML='<div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:500;color:#BA7517">Редактирование #'+iter+'</span><button class="btn-o" style="font-size:12px;padding:4px 10px" onclick="renderHist()">Отмена</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'+CATS.map((c,ci)=>{const key=CKEYS[ci];const v=r[key]||0;const cols=['#E6F1FB','#EAF3DE','#FAEEDA','#FBEAF0'];const tcols=['#0C447C','#27500A','#633806','#72243E'];return '<div><label style="font-size:12px;color:var(--t2);display:block;margin-bottom:4px">'+c+'</label><input type="number" id="e-'+ci+'" min="0" max="5" value="'+v+'" style="width:100%;padding:7px 10px;border:0.5px solid rgba(28,28,26,.3);border-radius:var(--rm);font-size:14px;background:var(--bg1)"><div style="display:flex;gap:4px;margin-top:5px">'+[1,2,3,4,5].map(n=>'<span style="display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;background:'+cols[ci]+';color:'+tcols[ci]+'" onclick="document.getElementById(\'e-'+ci+'\').value='+n+'">'+n+'</span>').join('')+'</div></div>';}).join('')+'</div><div style="margin-bottom:10px"><label style="font-size:12px;color:var(--t2);display:block;margin-bottom:4px">Комментарий</label><input type="text" id="e-cmt" value="'+(r.cmt||'').replace(/"/g,'&quot;')+'" placeholder="Добавьте комментарий..." style="width:100%;padding:8px 10px;border:0.5px solid rgba(28,28,26,.3);border-radius:var(--rm);font-size:14px;background:var(--bg1)"></div><button class="btn" onclick="saveEditIter(\''+name+'\','+iter+')" style="width:100%">Сохранить</button><div id="edit-ok" class="ok"></div>';}
+async function saveEditIter(name,iter){const att=Math.min(5,Math.max(0,parseInt(document.getElementById('e-0').value)||0));const hw=Math.min(5,Math.max(0,parseInt(document.getElementById('e-1').value)||0));const act=Math.min(5,Math.max(0,parseInt(document.getElementById('e-2').value)||0));const res=Math.min(5,Math.max(0,parseInt(document.getElementById('e-3').value)||0));const cmt=document.getElementById('e-cmt').value;scores[name][iter]={att,hw,act,res,cmt};await fbSet('/scores',scores);localStorage.setItem('zs',JSON.stringify(scores));refreshMentor();renderHist();const sel=document.getElementById('hist-sel');if(sel)sel.value=name;}
+async function deleteIter(name,iter){if(!confirm('Удалить итерацию #'+iter+' для '+name+'?'))return;if(scores[name])delete scores[name][iter];await fbSet('/scores',scores);localStorage.setItem('zs',JSON.stringify(scores));refreshMentor();renderHist();}
+function buildPins(){document.getElementById('pins-list').innerHTML=MENTEES.map(m=>'<div class="pin-row"><span style="font-weight:500">'+m+'</span><div style="display:flex;align-items:center;gap:8px"><span class="pv">'+pins[m]+'</span><button class="btn-o" style="font-size:12px;padding:4px 10px" onclick="changePin(\''+m+'\')">Изменить</button></div></div>').join('');document.getElementById('cur-mpin').textContent=mentorPin;}
+async function changePin(name){const np=prompt('Новый PIN для '+name+':');if(np&&np.length>=4){pins[name]=np;await fbSet('/pins',pins);localStorage.setItem('zp',JSON.stringify(pins));buildPins();}}
+async function changeMPin(){const np=document.getElementById('np').value;if(np.length<4){document.getElementById('pin-ok').style.color='#E24B4A';document.getElementById('pin-ok').textContent='Минимум 4 символа';return;}mentorPin=np;await fbSet('/mentorPin',np);localStorage.setItem('zm',np);document.getElementById('np').value='';document.getElementById('cur-mpin').textContent=np;document.getElementById('pin-ok').style.color='#3B6D11';document.getElementById('pin-ok').textContent='✓ PIN изменён';setTimeout(()=>document.getElementById('pin-ok').textContent='',3000);}
+function mtab(id,btn){document.querySelectorAll('.tabs .btn-o').forEach(b=>b.classList.remove('on'));btn.classList.add('on');['t-viz','t-cat','t-dyn','t-add','t-hist','t-pins'].forEach(t=>document.getElementById(t).style.display=t==='t-'+id?'block':'none');if(id==='dyn')buildDynCharts();}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('s-login').classList.contains('active')){if(document.getElementById('pinstep').style.display!=='none')loginMentee();else loginMentor();}});
+['a-att','a-hw','a-act','a-res'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',updPrev);});
+init();
+</script>
+</body>
+</html>
