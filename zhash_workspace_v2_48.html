@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zhash Pro — Рабочее пространство</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh}
+:root{--bg1:#fff;--bg2:#f1efe8;--blue:#185FA5;--blu:#E6F1FB;--bld:#0C447C;--t1:#1a1a18;--t2:#5f5e5a;--rm:8px;--rl:12px;--green:#1D9E75;--amber:#BA7517;--red:#E24B4A;--purple:#7F77DD}
+.wrap{max-width:960px;margin:0 auto;padding:0 1.25rem 3rem}
+.nav{background:#fff;border-bottom:0.5px solid rgba(28,28,26,.12);position:sticky;top:0;z-index:100}
+.nav-inner{max-width:960px;margin:0 auto;padding:0 1.25rem;display:flex;align-items:center;gap:4px;overflow-x:auto;height:52px}
+.nav-btn{background:none;border:none;padding:7px 13px;font-size:13px;cursor:pointer;color:var(--t2);border-radius:var(--rm);white-space:nowrap;font-family:inherit;transition:all .15s}
+.nav-btn:hover{background:var(--bg2)}
+.nav-btn.active{background:var(--blue);color:#fff}
+.page{display:none}.page.active{display:block}
+.hdr{padding:1.5rem 0 1rem}
+.hdr h1{font-size:22px;font-weight:500}
+.hdr p{font-size:14px;color:var(--t2);margin-top:4px}
+.card{background:#fff;border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1.25rem;margin-bottom:1rem}
+.card h3{font-size:15px;font-weight:500;margin-bottom:1rem}
+.btn{background:var(--blue);color:#fff;border:none;border-radius:var(--rm);padding:8px 16px;font-size:13px;cursor:pointer;font-weight:500;transition:background .15s;font-family:inherit}
+.btn:hover{background:var(--bld)}
+.btn-o{background:none;border:0.5px solid rgba(28,28,26,.25);border-radius:var(--rm);padding:7px 14px;font-size:13px;cursor:pointer;color:var(--t2);font-family:inherit;transition:all .15s}
+.btn-o:hover{background:var(--bg2)}
+.btn-o.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-red{background:none;border:0.5px solid rgba(226,75,74,.3);border-radius:var(--rm);padding:4px 9px;font-size:12px;cursor:pointer;color:var(--red);font-family:inherit}
+.btn-green{background:none;border:0.5px solid rgba(29,158,117,.3);border-radius:var(--rm);padding:4px 9px;font-size:12px;cursor:pointer;color:var(--green);font-family:inherit}
+input,select,textarea{padding:8px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:var(--rm);background:#fff;font-size:14px;color:var(--t1);outline:none;font-family:inherit;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(24,95,165,.12)}
+textarea{resize:vertical;min-height:80px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fg label{font-size:12px;color:var(--t2);font-weight:500}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:560px){.frow,.frow3{grid-template-columns:1fr}}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.tag-blue{background:#E6F1FB;color:#0C447C}
+.tag-green{background:#EAF3DE;color:#27500A}
+.tag-amber{background:#FAEEDA;color:#633806}
+.tag-red{background:#FCEBEB;color:#A32D2D}
+.tag-purple{background:#EEEDFE;color:#3C3489}
+.tag-pink{background:#FBEAF0;color:#72243E}
+.tag-gray{background:var(--bg2);color:var(--t2)}
+
+/* Mentee */
+.mentee-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:1.5rem}
+.mentee-card{background:#fff;border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1.25rem;cursor:pointer;transition:all .2s}
+.mentee-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(24,95,165,.08)}
+.mentee-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;margin-bottom:10px}
+.detail-panel{background:#fff;border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1.5rem}
+.detail-section{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:0.5px solid rgba(28,28,26,.08)}
+.detail-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.detail-label{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;font-weight:500}
+.stage-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid rgba(28,28,26,.2);background:var(--bg2);color:var(--t2);transition:all .15s;font-family:inherit}
+.stage-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.stage-btn.done{background:#EAF3DE;color:#27500A;border-color:rgba(29,158,117,.3)}
+
+/* Progress bar */
+.pbar-wrap{background:var(--bg2);border-radius:4px;height:8px;overflow:hidden;margin-top:6px}
+.pbar-fill{height:100%;border-radius:4px;transition:width .5s}
+
+/* Calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:1rem}
+.cal-day-name{text-align:center;font-size:11px;color:var(--t2);padding:6px 0;font-weight:500}
+.cal-day{min-height:72px;border-radius:var(--rm);border:0.5px solid rgba(28,28,26,.08);padding:5px;cursor:pointer;transition:all .15s;background:#fff;position:relative}
+.cal-day:hover{border-color:var(--blue);background:var(--blu)}
+.cal-day.today{border-color:var(--blue);border-width:1.5px}
+.cal-day.other-month{background:var(--bg2);opacity:.5}
+.cal-day-num{font-size:11px;font-weight:500;color:var(--t2);margin-bottom:2px}
+.cal-day.today .cal-day-num{color:var(--blue)}
+.cal-event{font-size:9px;padding:2px 4px;border-radius:3px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.cal-event.done-ev{opacity:.5;text-decoration:line-through}
+
+/* Tasks */
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid rgba(28,28,26,.06)}
+.task-item:last-child{border-bottom:none}
+.task-check{width:18px;height:18px;border-radius:4px;border:1.5px solid rgba(28,28,26,.25);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s;font-size:11px}
+.task-check.done{background:var(--green);border-color:var(--green);color:#fff}
+.task-text.done-t{text-decoration:line-through;color:var(--t2)}
+
+/* Week rows */
+.week-row{display:grid;grid-template-columns:90px 1fr;gap:10px;margin-bottom:6px;align-items:start}
+.week-label{font-size:12px;color:var(--t2);font-weight:500;padding-top:10px}
+.week-bar{background:var(--bg2);border-radius:var(--rm);padding:10px 14px}
+.week-bar.wdone{background:#EAF3DE}
+.week-bar.wactive{background:var(--blu);border:0.5px solid #85B7EB}
+
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem}
+.stat-card{background:#fff;border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem;text-align:center}
+.stat-num{font-size:28px;font-weight:500;line-height:1.1}
+.stat-lbl{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+
+/* Time types */
+.ttype-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+@media(max-width:500px){.ttype-grid{grid-template-columns:1fr 1fr}}
+.ttype-card{border-radius:var(--rm);padding:12px;text-align:center}
+
+.ok{font-size:13px;color:#3B6D11;margin-top:6px;min-height:16px}
+.er{font-size:13px;color:var(--red);margin-top:6px}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <span style="font-size:15px;font-weight:500;margin-right:6px;white-space:nowrap">Zhash Pro</span>
+    <button class="nav-btn active" onclick="goPage('overview',this)">Обзор</button>
+    <button class="nav-btn" onclick="goPage('mentees',this)">Менти</button>
+    <button class="nav-btn" onclick="goPage('calendar',this)">Календарь</button>
+    <button class="nav-btn" onclick="goPage('timesheet',this)">Таймшит</button>
+    <button class="nav-btn" onclick="goPage('tasks',this)">Задачи</button>
+    <button class="nav-btn" onclick="window.open('https://anarozova.github.io/zhash-mentoring/mentoring_zhash_v2_7.html','_blank')">Баллы ↗</button>
+    <button class="nav-btn" onclick="exportReport()" style="color:var(--green)">📄 Экспорт</button>
+    <button class="nav-btn" onclick="exportPlans()" style="color:var(--amber)">📋 Планы менти</button>
+    <button class="nav-btn" id="voice-btn" onclick="toggleVoice()" style="color:#993556">🎤 Голос</button>
+  </div>
+</nav>
+
+<!-- VOICE PANEL -->
+<div id="voice-panel" style="display:none;position:fixed;bottom:20px;right:20px;z-index:1000;background:#fff;border:0.5px solid rgba(28,28,26,.15);border-radius:var(--rl);padding:1.25rem;box-shadow:0 8px 32px rgba(0,0,0,.12);width:340px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="font-size:14px;font-weight:500">🎤 Голосовой помощник</div>
+    <button onclick="closeVoice()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--t2)">✕</button>
+  </div>
+  <div id="voice-status" style="font-size:13px;color:var(--t2);margin-bottom:10px">Нажми кнопку и скажи команду</div>
+  <div id="voice-text" style="min-height:48px;background:var(--bg2);border-radius:var(--rm);padding:10px;font-size:13px;color:var(--t1);margin-bottom:10px;font-style:italic"></div>
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <button id="voice-start-btn" class="btn" onclick="startListening()" style="flex:1">🎤 Говори</button>
+    <button class="btn-o" onclick="processVoiceText()" id="voice-process-btn" style="display:none">✓ Выполнить</button>
+  </div>
+  <div id="voice-result" style="font-size:13px;min-height:20px"></div>
+  <div style="margin-top:10px;font-size:11px;color:var(--t2);line-height:1.6">
+    <strong>Примеры команд:</strong><br>
+    "Добавь встречу с Майрам в пятницу в 10 утра"<br>
+    "Задание Бактияру — сделать отчёт до 15 июня"<br>
+    "Запиши 2 часа консультации с Азаматом сегодня"<br>
+    "Добавь задачу всем — подготовить презентацию"
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<div id="page-overview" class="page active">
+<div class="wrap">
+  <div class="hdr">
+    <h1>Рабочее пространство</h1>
+    <p>Mentoring Zhash Pro · 20 мая — 10 июля 2026 · 7 менти</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-lbl">Недель осталось</div><div class="stat-num" style="color:var(--blue)" id="weeks-left">-</div></div>
+    <div class="stat-card"><div class="stat-lbl">Встреч запланировано</div><div class="stat-num" style="color:var(--green)" id="ev-count">0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Встреч проведено</div><div class="stat-num" style="color:var(--amber)" id="ev-done-count">0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Задач выполнено</div><div class="stat-num" style="color:var(--t1)" id="tasks-stat">0/0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Часов потрачено</div><div class="stat-num" style="color:var(--purple)" id="hours-stat">0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Менти</div><div class="stat-num">7</div></div>
+  </div>
+
+  <!-- Program progress -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h3 style="margin:0">Прогресс программы</h3>
+      <span id="prog-pct" style="font-size:13px;color:var(--blue);font-weight:500">0%</span>
+    </div>
+    <div class="pbar-wrap" style="height:10px">
+      <div id="prog-bar" style="height:100%;background:var(--blue);border-radius:4px;transition:width .5s;width:0%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-top:4px">
+      <span>20 мая 2026</span><span id="prog-label"></span><span>10 июля 2026</span>
+    </div>
+  </div>
+
+  <!-- Stages -->
+  <div class="card">
+    <h3>Этапы программы</h3>
+    <div id="overview-stages"></div>
+  </div>
+
+  <!-- Upcoming -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h3 style="margin:0">Ближайшие встречи</h3>
+      <button class="btn btn-sm" onclick="goPage('calendar',document.querySelectorAll('.nav-btn')[3])">+ Добавить</button>
+    </div>
+    <div id="upcoming-events"></div>
+  </div>
+
+  <!-- Recent notes -->
+  <div class="card">
+    <h3>Последние заметки по менти</h3>
+    <div id="recent-notes"></div>
+  </div>
+</div>
+</div>
+
+<!-- MENTEES -->
+<div id="page-mentees" class="page">
+<div class="wrap">
+  <div class="hdr" style="display:flex;align-items:center;justify-content:space-between">
+    <div><h1>Менти</h1><p>Карточки участников — нажми для детального просмотра</p></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn" onclick="importDiagnosticsFromData()" style="background:var(--green)">✅ Загрузить диагностику</button>
+      <label class="btn-o" style="cursor:pointer;margin:0;padding:7px 14px;font-size:13px">
+        📂 Из Excel файла
+        <input type="file" id="diag-file" accept=".xlsx,.csv" style="display:none" onchange="importDiagnostics(this)">
+      </label>
+    </div>
+  </div>
+  <div id="import-status" style="display:none" class="card" style="margin-bottom:1rem"></div>
+  <div class="mentee-grid" id="mentee-grid"></div>
+  <div id="mentee-detail" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+      <button class="btn-o" onclick="closeDetail()">← Назад</button>
+      <span id="detail-title" style="font-size:16px;font-weight:500"></span>
+    </div>
+    <div class="detail-panel">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:1.5rem">
+        <div id="detail-avatar" class="mentee-avatar" style="width:56px;height:56px;font-size:20px"></div>
+        <div>
+          <div id="detail-name" style="font-size:18px;font-weight:500"></div>
+          <div id="detail-biz" style="font-size:14px;color:var(--t2);margin-top:2px"></div>
+          <div id="detail-city" style="font-size:13px;color:var(--t2);margin-top:2px"></div>
+          <div id="detail-scores" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">Этапы работы</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="detail-stages-wrap"></div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">Выполнение плана</div>
+        <div id="d-progress-auto" style="margin-bottom:6px"></div>
+        <div class="pbar-wrap"><div id="d-progress-bar" class="pbar-fill" style="background:var(--blue);width:0%"></div></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+          <input type="range" id="d-progress" min="0" max="100" step="5" value="0" style="flex:1;padding:0" oninput="updateProgress()">
+          <span id="d-progress-val" style="font-size:16px;font-weight:500;color:var(--blue);min-width:40px">0%</span>
+        </div>
+        <div style="font-size:11px;color:var(--t2);margin-top:4px">Двигай слайдер вручную по мере выполнения плана менти</div>
+      </div>
+
+      <div class="detail-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="detail-label" style="margin:0">📋 Разработанный план действий</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-o btn-sm" onclick="renderPlanTable()" title="Обновить из Firebase">🔄</button>
+            <button class="btn btn-sm" onclick="addPlanRow()">+ Строка</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Менти заполняют сами в своём дашборде — нажми 🔄 чтобы обновить</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px" id="d-plan-table">
+            <thead>
+              <tr style="background:var(--bg2)">
+                <th style="padding:8px;border:0.5px solid rgba(28,28,26,.15);text-align:left;font-weight:500;font-size:12px;color:var(--t2)">Деятельность</th>
+                <th style="padding:8px;border:0.5px solid rgba(28,28,26,.15);text-align:left;font-weight:500;font-size:12px;color:var(--t2)">Индикатор</th>
+                <th style="padding:8px;border:0.5px solid rgba(28,28,26,.15);text-align:left;font-weight:500;font-size:12px;color:var(--t2)">Бюджет/Ресурсы</th>
+                <th style="padding:8px;border:0.5px solid rgba(28,28,26,.15);text-align:left;font-weight:500;font-size:12px;color:var(--t2)">Срок</th>
+                <th style="padding:4px;border:0.5px solid rgba(28,28,26,.15);width:30px"></th>
+              </tr>
+            </thead>
+            <tbody id="d-plan-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">Контакт</div>
+        <input type="text" id="d-phone" placeholder="Телефон / Telegram" oninput="autoSaveDetail()">
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">О бизнесе</div>
+        <textarea id="d-biz-info" placeholder="Описание бизнеса, особенности, сфера..." rows="3" oninput="autoSaveDetail()"></textarea>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">Результаты диагностики</div>
+        <textarea id="d-diagnosis" placeholder="Основные проблемы, сильные стороны, выводы..." rows="4" oninput="autoSaveDetail()"></textarea>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">Индивидуальный план действий</div>
+        <textarea id="d-plan" placeholder="Что нужно сделать менти по шагам..." rows="4" oninput="autoSaveDetail()"></textarea>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">Договорённости и следующие шаги</div>
+        <textarea id="d-agreements" placeholder="О чём договорились, что должны сделать до следующей встречи..." rows="3" oninput="autoSaveDetail()"></textarea>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">Заметки ментора</div>
+        <textarea id="d-notes" placeholder="Личные заметки, наблюдения, идеи..." rows="3" oninput="autoSaveDetail()"></textarea>
+      </div>
+
+      <!-- TRACTION SECTION -->
+      <div class="detail-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="detail-label" style="margin:0">📊 Трекшн</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-o btn-sm" onclick="showTractionTab('diag')" id="tt-diag">Диагностика</button>
+            <button class="btn-o btn-sm on" onclick="showTractionTab('weeks')" id="tt-weeks">Недели</button>
+          </div>
+        </div>
+
+        <!-- Traction Diagnostics -->
+        <div id="traction-diag" style="display:none">
+          <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Вопросы диагностики — заполни ответы менти</div>
+          <div id="traction-diag-form"></div>
+        </div>
+
+        <!-- Traction Weekly -->
+        <div id="traction-weeks">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <div style="font-size:13px;font-weight:500">ЦЕЛЬ НА 8 НЕДЕЛЬ (SMART):</div>
+          </div>
+          <textarea id="d-smart-goal" placeholder="Специфичная, измеримая, достижимая, релевантная цель на весь период менторинга..." rows="2" oninput="autoSaveDetail()" style="margin-bottom:12px"></textarea>
+          <div id="traction-weeks-list"></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="detail-label" style="margin:0">Задачи менти</div>
+          <button class="btn btn-sm" onclick="addTaskForCurrentMentee()">+ Задача</button>
+        </div>
+        <div id="d-tasks-list"></div>
+      </div>
+
+      <div style="font-size:12px;color:var(--t2);margin-top:4px" id="detail-saved"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- CALENDAR -->
+<div id="page-calendar" class="page">
+<div class="wrap">
+  <div class="hdr" style="display:flex;align-items:center;justify-content:space-between">
+    <div><h1>Календарь</h1><p>Встречи, выезды, договорённости</p></div>
+    <button class="btn" onclick="openAddEvent()">+ Добавить</button>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+    <button class="btn-o" onclick="prevMonth()">←</button>
+    <span id="cal-title" style="font-size:16px;font-weight:500"></span>
+    <button class="btn-o" onclick="nextMonth()">→</button>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+
+  <div id="add-event-form" class="card" style="display:none">
+    <h3 id="ev-form-title">Добавить событие</h3>
+    <div class="frow">
+      <div class="fg"><label>Дата</label><input type="date" id="ev-date"></div>
+      <div class="fg"><label>Начало</label><input type="time" id="ev-time" value="10:00" oninput="calcDuration()"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Конец</label><input type="time" id="ev-time-end" value="11:00" oninput="calcDuration()"></div>
+      <div class="fg"><label>Продолжительность</label>
+        <div id="ev-duration" style="padding:9px 12px;background:var(--bg2);border-radius:var(--rm);font-size:14px;font-weight:500;color:var(--blue)">1 ч 0 мин</div>
+      </div>
+    </div>
+    <div class="fg"><label>Тип</label>
+      <select id="ev-type">
+        <option value="meeting">Встреча/Тренинг с менти</option>
+        <option value="visit">Выезд к бизнесу</option>
+        <option value="call">Звонок/Консультация</option>
+        <option value="project">Встреча с проектом</option>
+        <option value="partner">Встреча с партнёрами</option>
+        <option value="deadline">Дедлайн</option>
+        <option value="other">Другое</option>
+      </select>
+    </div>
+    <div class="fg"><label>Менти (или группа)</label>
+      <select id="ev-mentee">
+        <option value="all">Все менти (группа)</option>
+        <option value="project">— (встреча проекта)</option>
+        <option>Майрам Райымова</option>
+        <option>Бактияр Ишенбеков</option>
+        <option>Насыят Суйунушова</option>
+        <option>Тынычбек Урайимов</option>
+        <option>Азамат Белеков</option>
+        <option>Айкан Сопубекова</option>
+        <option>Сезим Шайыкова</option>
+      </select>
+    </div>
+    <div class="fg"><label>Описание</label><input type="text" id="ev-desc" placeholder="Что планируется..."></div>
+    <div class="fg"><label>Место</label><input type="text" id="ev-place" placeholder="Адрес или онлайн"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn" onclick="saveEvent()">Сохранить</button>
+      <button class="btn-o" onclick="closeAddEvent()">Отмена</button>
+    </div>
+    <div class="ok" id="ev-ok"></div>
+    <input type="hidden" id="ev-edit-id">
+  </div>
+
+  <div class="card" style="margin-top:1rem">
+    <h3>Все события</h3>
+    <div id="events-list"></div>
+  </div>
+</div>
+</div>
+
+<!-- TIMESHEET -->
+<div id="page-timesheet" class="page">
+<div class="wrap">
+  <div class="hdr"><h1>Таймшит</h1><p>20 мая — 10 июля 2026 · 8 недель</p></div>
+
+  <div class="card">
+    <h3>Прогресс программы</h3>
+    <div class="pbar-wrap" style="height:12px;margin-bottom:8px">
+      <div id="ts-prog-bar" style="height:100%;background:var(--blue);border-radius:4px;transition:width .5s;width:0%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2)">
+      <span>20 мая 2026</span><span id="ts-prog-label"></span><span>10 июля 2026</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Учёт времени по видам работы</h3>
+    <div class="ttype-grid" id="ttype-grid"></div>
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px;margin-top:4px">Добавить запись</div>
+    <div class="frow">
+      <div class="fg"><label>Дата</label><input type="date" id="ts-date"></div>
+      <div class="fg"><label>Часов</label><input type="number" id="ts-hours" min="0.5" max="12" step="0.5" value="1" style="width:100%"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Вид работы</label>
+        <select id="ts-type">
+          <option value="diag">Диагностика</option>
+          <option value="train">Тренинг</option>
+          <option value="consult">Консультация</option>
+          <option value="visit">Выезд</option>
+          <option value="meeting">Встреча</option>
+          <option value="report">Отчётность/Документация</option>
+          <option value="prep">Подготовка</option>
+        </select>
+      </div>
+      <div class="fg"><label>Менти</label>
+        <select id="ts-mentee">
+          <option value="all">Все/Группа</option>
+          <option>Майрам</option><option>Бактияр</option><option>Насыят</option>
+          <option>Тынычбек</option><option>Азамат</option><option>Айкан</option><option>Сезим</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Описание</label><input type="text" id="ts-desc" placeholder="Что делали..."></div>
+    <button class="btn" onclick="saveTimeEntry()">Добавить запись</button>
+    <div class="ok" id="ts-ok"></div>
+    <div style="margin-top:1.5rem" id="time-log"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h3 style="margin:0">Мой недельный таймшит</h3>
+      <span style="font-size:12px;color:var(--t2)">Учёт моего времени по неделям</span>
+    </div>
+    <div id="weeks-list"></div>
+  </div>
+</div>
+</div>
+
+<!-- TASKS -->
+<div id="page-tasks" class="page">
+<div class="wrap">
+  <div class="hdr" style="display:flex;align-items:center;justify-content:space-between">
+    <div><h1>Задачи</h1><p>Трекер — что сделали, что нет</p></div>
+    <button class="btn" onclick="showAddTask()">+ Задача</button>
+  </div>
+  <div id="add-task-form" class="card" style="display:none">
+    <h3>Новая задача</h3>
+    <div class="fg"><label>Задача</label><input type="text" id="task-text" placeholder="Что нужно сделать..."></div>
+    <div class="frow">
+      <div class="fg"><label>Кому</label>
+        <select id="task-mentee" onchange="onTaskMenteeChange()">
+          <option value="all">📋 Общая (только для меня)</option>
+          <option value="group">👥 Всем менти (групповое)</option>
+          <option disabled>──────────</option>
+          <option value="Майрам Райымова">Майрам Райымова</option>
+          <option value="Бактияр Ишенбеков">Бактияр Ишенбеков</option>
+          <option value="Насыят Суйунушова">Насыят Суйунушова</option>
+          <option value="Тынычбек Урайимов">Тынычбек Урайимов</option>
+          <option value="Азамат Белеков">Азамат Белеков</option>
+          <option value="Айкан Сопубекова">Айкан Сопубекова</option>
+          <option value="Сезим Шайыкова">Сезим Шайыкова</option>
+        </select>
+      </div>
+      <div class="fg"><label>Срок</label><input type="date" id="task-due"></div>
+    </div>
+    <div id="task-group-info" style="display:none;background:var(--blu);border-radius:var(--rm);padding:10px;font-size:13px;color:var(--bld);margin-bottom:10px">
+      👥 Будет создана задача для каждого из 7 менти отдельно + кнопка WhatsApp для каждого
+    </div>
+    <div class="fg"><label>Приоритет</label>
+      <select id="task-priority">
+        <option value="high">Высокий</option>
+        <option value="normal" selected>Обычный</option>
+        <option value="low">Низкий</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="saveTask()">Сохранить</button>
+      <button class="btn-o" onclick="hideAddTask()">Отмена</button>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap">
+      <button class="btn-o btn-sm on" onclick="filterTasks('all',this)">Все</button>
+      <button class="btn-o btn-sm" onclick="filterTasks('active',this)">Активные</button>
+      <button class="btn-o btn-sm" onclick="filterTasks('done',this)">Выполненные</button>
+    </div>
+    <div id="tasks-list"></div>
+  </div>
+</div>
+</div>
+
+<script>
+// ============ CONSTANTS ============
+const FB = 'https://zhash-pro-default-rtdb.europe-west1.firebasedatabase.app';
+const START = new Date(2026,4,20);
+const END = new Date(2026,6,10);
+
+const MENTEES_DATA = [
+  {name:'Майрам Райымова',short:'Майрам',biz:'Майрам массаж — оздоровление',city:'Нарын',color:'#185FA5',bg:'#E6F1FB',initials:'МР'},
+  {name:'Бактияр Ишенбеков',short:'Бактияр',biz:'Shifaa honey — мёд',city:'Балыкчы',color:'#1D9E75',bg:'#EAF3DE',initials:'БИ'},
+  {name:'Насыят Суйунушова',short:'Насыят',biz:'Akylman kids — обучение детей с РАС',city:'Каракол',color:'#D85A30',bg:'#FAECE7',initials:'НС'},
+  {name:'Тынычбек Урайимов',short:'Тынычбек',biz:'Qadeq studios — швейная',city:'Бишкек',color:'#7F77DD',bg:'#EEEDFE',initials:'ТУ'},
+  {name:'Азамат Белеков',short:'Азамат',biz:'OkuPro — онлайн обучение',city:'Бишкек',color:'#BA7517',bg:'#FAEEDA',initials:'АБ'},
+  {name:'Айкан Сопубекова',short:'Айкан',biz:'Клевер — детские развивающие',city:'Бишкек',color:'#993556',bg:'#FBEAF0',initials:'АС'},
+  {name:'Сезим Шайыкова',short:'Сезим',biz:'Акылман кидс — детский сад',city:'Бишкек',color:'#0F6E56',bg:'#E1F5EE',initials:'СШ'}
+];
+
+const STAGES = ['Анкета заполнена','Диагностика проведена','Тренинг пройден','Консультация проведена','Бизнес посещен','План готов'];
+
+const WEEKS = [
+  {n:1,dates:'20–26 мая',focus:'Знакомство, анализ анкет, диагностика'},
+  {n:2,dates:'27 мая – 2 июня',focus:'Выездная диагностика (Нарын, Балыкчы)'},
+  {n:3,dates:'3–9 июня',focus:'Выездная диагностика (Каракол, Бишкек)'},
+  {n:4,dates:'10–16 июня',focus:'Тренинг #1 — Бизнес-модель и стратегия'},
+  {n:5,dates:'17–23 июня',focus:'Индивидуальные консультации'},
+  {n:6,dates:'24–30 июня',focus:'Тренинг #2 — Маркетинг и продажи'},
+  {n:7,dates:'1–7 июля',focus:'Разработка индивидуальных планов действий'},
+  {n:8,dates:'8–10 июля',focus:'Финальные встречи, итоги, отчёт'}
+];
+
+const TYPE_COLORS = {meeting:'#E6F1FB',visit:'#EAF3DE',call:'#FAEEDA',project:'#EEEDFE',partner:'#FBEAF0',deadline:'#FCEBEB',other:'var(--bg2)'};
+const TYPE_TEXT = {meeting:'#0C447C',visit:'#27500A',call:'#633806',project:'#3C3489',partner:'#72243E',deadline:'#A32D2D',other:'var(--t2)'};
+const TYPE_NAMES = {meeting:'Встреча',visit:'Выезд',call:'Звонок',project:'Проект',partner:'Партнёр',deadline:'Дедлайн',other:'Другое'};
+const TIME_TYPES = {diag:'Диагностика',train:'Тренинг',consult:'Консультация',visit:'Выезд',meeting:'Встреча',report:'Отчётность',prep:'Подготовка'};
+const TIME_COLORS = {diag:'#185FA5',train:'#1D9E75',consult:'#BA7517',visit:'#0F6E56',meeting:'#7F77DD',report:'#993556',prep:'#5f5e5a'};
+
+// ============ DATA ============
+let events=[], tasks=[], menteeDetails={}, timeEntries=[];
+let calYear=2026, calMonth=4;
+let currentMentee=null, taskFilter='all';
+let fbScores={};
+
+function load(){
+  try{events=JSON.parse(localStorage.getItem('zw_events')||'[]');}catch{events=[];}
+  try{tasks=JSON.parse(localStorage.getItem('zw_tasks')||'[]');}catch{tasks=[];}
+  try{menteeDetails=JSON.parse(localStorage.getItem('zw_mdetails')||'{}');}catch{menteeDetails={};}
+  try{timeEntries=JSON.parse(localStorage.getItem('zw_time')||'[]');}catch{timeEntries=[];}
+}
+function save(){
+  localStorage.setItem('zw_events',JSON.stringify(events));
+  localStorage.setItem('zw_tasks',JSON.stringify(tasks));
+  localStorage.setItem('zw_mdetails',JSON.stringify(menteeDetails));
+  localStorage.setItem('zw_time',JSON.stringify(timeEntries));
+}
+
+// Load scores from Firebase
+async function loadScores(){
+  try{
+    const r=await fetch(FB+'/scores.json?t='+Date.now());
+    if(r.ok){const d=await r.json();if(d)fbScores=fixScores(d);}
+  }catch{}
+}
+function fixScores(sc){
+  const out={};
+  Object.keys(sc||{}).forEach(name=>{
+    const d=sc[name];
+    if(Array.isArray(d)){const obj={};d.forEach((v,i)=>{if(v&&i>0)obj[i]=v;});out[name]=obj;}
+    else{out[name]=d||{};}
+  });
+  return out;
+}
+function getScores(shortName){
+  const full=MENTEES_DATA.find(m=>m.short===shortName||m.name===shortName);
+  if(!full)return{att:0,hw:0,act:0,res:0,total:0,iters:0};
+  const d=fbScores[full.short]||fbScores[full.name]||{};
+  let att=0,hw=0,act=0,res=0;
+  Object.values(d).forEach(v=>{if(v){att+=v.att||0;hw+=v.hw||0;act+=v.act||0;res+=v.res||0;}});
+  return{att,hw,act,res,total:att+hw+act+res,iters:Object.keys(d).length};
+}
+
+// ============ NAV ============
+function goPage(id,btn){
+  load(); // reload fresh data every time
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='overview')renderOverview();
+  if(id==='mentees')renderMentees();
+  if(id==='calendar')renderCalendar();
+  if(id==='timesheet')renderTimesheet();
+  if(id==='tasks')renderTasks();
+}
+
+// ============ OVERVIEW ============
+function renderOverview(){
+  const now=new Date();
+  const weeksLeft=Math.max(0,Math.ceil((END-now)/(7*24*3600*1000)));
+  const total=(END-START)/(7*24*3600*1000);
+  const done=Math.max(0,Math.min(total,(now-START)/(7*24*3600*1000)));
+  const pct=Math.min(100,Math.round(done/total*100));
+  document.getElementById('weeks-left').textContent=weeksLeft;
+  document.getElementById('ev-count').textContent=events.length;
+  document.getElementById('ev-done-count').textContent=events.filter(e=>e.done).length;
+  const td=tasks.filter(t=>t.done).length;
+  document.getElementById('tasks-stat').textContent=td+'/'+tasks.length;
+  const totalH=timeEntries.reduce((s,t)=>s+t.hours,0);
+  document.getElementById('hours-stat').textContent=totalH+'ч';
+  document.getElementById('prog-bar').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-label').textContent=Math.min(8,Math.floor(done))+' из 8 недель';
+
+  // Stages — per mentee dynamic from traction
+  const el=document.getElementById('overview-stages');
+  el.innerHTML=MENTEES_DATA.map(m=>{
+    const stages=getMenteeStages(m.name);
+    const doneCount=stages.filter(s=>s.status==='done').length;
+    const activeCount=stages.filter(s=>s.status==='active').length;
+    const pct=Math.round(doneCount/stages.length*100);
+    return `<div style="background:var(--bg2);border-radius:var(--rm);padding:10px 14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="mentee-avatar" style="width:28px;height:28px;font-size:10px;background:${m.bg};color:${m.color};margin:0">${m.initials}</div>
+          <span style="font-size:13px;font-weight:500">${m.name}</span>
+        </div>
+        <span style="font-size:12px;font-weight:500;color:${pct===100?'#27500A':pct>0?'#633806':'var(--t2)'}">${doneCount}/${stages.length} этапов</span>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        ${stages.map(s=>stageTagHtml(s)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Upcoming
+  const upcoming=events.filter(e=>!e.done&&new Date(e.date)>=now).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5);
+  const uel=document.getElementById('upcoming-events');
+  if(!upcoming.length){uel.innerHTML='<p style="font-size:13px;color:var(--t2)">Нет запланированных встреч</p>';}
+  else uel.innerHTML=upcoming.map(e=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid rgba(28,28,26,.06)">
+      <div style="min-width:52px;text-align:center;background:var(--bg2);border-radius:var(--rm);padding:4px 6px">
+        <div style="font-size:18px;font-weight:500;color:var(--blue)">${new Date(e.date).getDate()}</div>
+        <div style="font-size:10px;color:var(--t2)">${new Date(e.date).toLocaleDateString('ru-RU',{month:'short'})}</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">${e.desc}</div>
+        <div style="font-size:12px;color:var(--t2)">${e.mentee==='all'?'Все менти':e.mentee==='project'?'Встреча проекта':e.mentee}${e.time?' · '+e.time:''}${e.place?' · '+e.place:''}</div>
+      </div>
+      <span class="tag" style="background:${TYPE_COLORS[e.type]};color:${TYPE_TEXT[e.type]}">${TYPE_NAMES[e.type]||''}</span>
+    </div>`).join('');
+
+  // Recent notes
+  const notes=Object.entries(menteeDetails).filter(([k,v])=>v.notes||v.agreements).slice(0,4);
+  const nel=document.getElementById('recent-notes');
+  if(!notes.length){nel.innerHTML='<p style="font-size:13px;color:var(--t2)">Заметок пока нет</p>';}
+  else nel.innerHTML=notes.map(([name,v])=>{
+    const m=MENTEES_DATA.find(x=>x.name===name);
+    return `<div style="display:flex;gap:10px;padding:9px 0;border-bottom:0.5px solid rgba(28,28,26,.06)">
+      ${m?`<div class="mentee-avatar" style="width:32px;height:32px;font-size:11px;background:${m.bg};color:${m.color};flex-shrink:0">${m.initials}</div>`:''}
+      <div><div style="font-size:12px;font-weight:500;margin-bottom:2px">${name}</div>
+      <div style="font-size:13px;color:var(--t2)">${(v.agreements||v.notes||'').substring(0,100)}...</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ============ MENTEES ============
+
+// Вычисляет этапы автоматически из трекшна + событий
+function getMenteeStages(menteeFullName){
+  const d=menteeDetails[menteeFullName]||{};
+  const tw=d.tractionWeeks||{};
+  const menteeEvents=events.filter(e=>e.mentee===menteeFullName);
+  const stages=[];
+
+  // 1. Анкета заполнена — только если явно отмечено вручную или есть данные из анкеты
+  const hasManualAnketa=d.stages&&d.stages.includes('Анкета заполнена');
+  const hasDiagData=d.tractionDiag&&Object.keys(d.tractionDiag).filter(k=>d.tractionDiag[k]&&d.tractionDiag[k].trim().length>3).length>=3;
+  const hasPhone=d.phone&&d.phone.trim().length>5;
+  // Данные из импорта не считаем — только трекшн диагностика или ручная отметка
+  if(hasManualAnketa||hasDiagData)
+    stages.push({name:'Анкета заполнена',status:'done'});
+  else stages.push({name:'Анкета заполнена',status:'pending'});
+
+  // 2. Диагностика — только если есть событие выезда конкретно к этому менти
+  const diagEvents=menteeEvents.filter(e=>e.type==='visit'||(e.desc&&e.desc.toLowerCase().includes('диагност')));
+  if(diagEvents.filter(e=>e.done).length>0)
+    stages.push({name:'Диагностика проведена',status:'done'});
+  else if(diagEvents.length>0)
+    stages.push({name:'Диагностика проведена',status:'active'});
+  else stages.push({name:'Диагностика проведена',status:'pending'});
+
+  // 3. Тренинг — только события тренинга конкретно к этому менти
+  const trainEvents=menteeEvents.filter(e=>e.type==='meeting'&&e.desc&&e.desc.toLowerCase().includes('тренинг'));
+  if(trainEvents.filter(e=>e.done).length>0)
+    stages.push({name:'Тренинг пройден',status:'done'});
+  else if(trainEvents.length>0)
+    stages.push({name:'Тренинг пройден',status:'active'});
+  else stages.push({name:'Тренинг пройден',status:'pending'});
+
+  // 4. Бизнес посещён — события выезда завершены
+  const visitEvents=menteeEvents.filter(e=>e.type==='visit');
+  if(visitEvents.filter(e=>e.done).length>0)
+    stages.push({name:'Бизнес посещён',status:'done'});
+  else if(visitEvents.length>0)
+    stages.push({name:'Бизнес посещён',status:'active'});
+  else stages.push({name:'Бизнес посещён',status:'pending'});
+
+  // 5. Консультация — только события звонков конкретно к этому менти
+  const consultEvents=menteeEvents.filter(e=>e.type==='call'||(e.desc&&e.desc.toLowerCase().includes('консульт')));
+  if(consultEvents.filter(e=>e.done).length>0)
+    stages.push({name:'Консультация проведена',status:'done'});
+  else if(consultEvents.length>0)
+    stages.push({name:'Консультация проведена',status:'active'});
+  else stages.push({name:'Консультация проведена',status:'pending'});
+
+  // 6. План готов — только если явно отмечено вручную
+  const hasPlanManual=d.stages&&d.stages.includes('План готов');
+  const hasActionPlan=d.actionPlan&&d.actionPlan.filter(r=>r.activity&&r.activity.trim()).length>=2;
+  if(hasPlanManual||hasActionPlan)
+    stages.push({name:'План готов',status:'done'});
+  else stages.push({name:'План готов',status:'pending'});
+
+  // 7. Выполнение плана в % — вручную выставляется ментором
+  const prog=d.progress||0;
+  const progStatus=prog>=100?'done':prog>0?'active':'pending';
+  stages.push({name:`Выполнение плана: ${prog}%`,status:progStatus,progress:prog});
+
+  return stages;
+}
+
+function stageTagHtml(stage){
+  if(stage.progress!==undefined){
+    const col=stage.progress>=100?'#27500A':stage.progress>0?'#633806':'var(--t2)';
+    const bg=stage.progress>=100?'#EAF3DE':stage.progress>0?'#FAEEDA':'var(--bg2)';
+    return `<span class="tag" style="background:${bg};color:${col};font-size:10px;display:inline-flex;align-items:center;gap:5px">
+      ${stage.progress>=100?'✓':stage.progress>0?'▶':'○'} ${stage.name}
+    </span>`;
+  }
+  if(stage.status==='done') return `<span class="tag tag-green" style="font-size:10px">✓ ${stage.name}</span>`;
+  if(stage.status==='active') return `<span class="tag tag-amber" style="font-size:10px">▶ ${stage.name}</span>`;
+  return `<span class="tag tag-gray" style="font-size:10px">○ ${stage.name}</span>`;
+}
+
+function calcProgressFromStages(menteeFullName){
+  const d=menteeDetails[menteeFullName]||{};
+  return{auto:d.progress||0};
+}
+
+function renderMentees(){
+  document.getElementById('mentee-grid').style.display='grid';
+  document.getElementById('mentee-detail').style.display='none';
+  document.getElementById('mentee-grid').innerHTML=MENTEES_DATA.map((m,i)=>{
+    const d=menteeDetails[m.name]||{};
+    const sc=getScores(m.short);
+    const autoP=calcProgressFromStages(m.name);
+    const prog=Math.max(autoP.auto,d.progress||0);
+    const stagesCount=STAGES.filter(s=>d.stages&&d.stages.includes(s)).length;
+    return `<div class="mentee-card" onclick="openDetail(${i})">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div class="mentee-avatar" style="background:${m.bg};color:${m.color};margin:0">${m.initials}</div>
+        <div>
+          <div style="font-size:14px;font-weight:500">${m.name}</div>
+          <div style="font-size:12px;color:var(--t2)">${m.city}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:8px">${m.biz}</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">
+        ${getMenteeStages(m.name).map(s=>stageTagHtml(s)).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:4px">
+        <span>Выполнение плана</span><span style="font-weight:500;color:var(--blue)">${prog}%</span>
+      </div>
+      <div class="pbar-wrap"><div class="pbar-fill" style="width:${prog}%;background:${m.color}"></div></div>
+      ${sc.total>0?`<div style="margin-top:8px;font-size:11px;color:var(--t2)">Баллы: <strong style="color:var(--blue)">${sc.total}</strong> · ${sc.iters} итераций</div>`:''}
+      ${d.agreements?`<div style="font-size:11px;color:var(--t2);margin-top:8px;padding-top:8px;border-top:0.5px solid rgba(28,28,26,.08)">📌 ${d.agreements.substring(0,70)}...</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function openDetail(i){
+  currentMentee=MENTEES_DATA[i].name;
+  const m=MENTEES_DATA[i];
+  const d=menteeDetails[m.name]||{};
+  const sc=getScores(m.short);
+  document.getElementById('mentee-grid').style.display='none';
+  document.getElementById('mentee-detail').style.display='block';
+  document.getElementById('detail-title').textContent=m.name;
+  document.getElementById('detail-avatar').style.cssText=`background:${m.bg};color:${m.color};width:56px;height:56px;font-size:20px`;
+  document.getElementById('detail-avatar').textContent=m.initials;
+  document.getElementById('detail-name').textContent=m.name;
+  document.getElementById('detail-biz').textContent=m.biz;
+  document.getElementById('detail-city').textContent='📍 '+m.city;
+  document.getElementById('detail-scores').innerHTML=sc.total>0?
+    `<div style="display:flex;gap:6px;flex-wrap:wrap">
+      <span class="tag tag-blue">Баллов: ${sc.total}</span>
+      <span class="tag tag-green">Итераций: ${sc.iters}</span>
+    </div>`:'<span style="font-size:12px;color:var(--t2)">Баллов пока нет</span>';
+  document.getElementById('d-phone').value=d.phone||'';
+  document.getElementById('d-biz-info').value=d.bizInfo||'';
+  document.getElementById('d-diagnosis').value=d.diagnosis||'';
+  document.getElementById('d-plan').value=d.plan||'';
+  document.getElementById('d-agreements').value=d.agreements||'';
+  document.getElementById('d-notes').value=d.notes||'';
+  const prog=d.progress||0;
+  document.getElementById('d-progress').value=prog;
+  document.getElementById('d-progress-val').textContent=prog+'%';
+  document.getElementById('d-progress-bar').style.width=prog+'%';
+
+  // Stages — dynamic from traction + manual override
+  const autoStages=getMenteeStages(m.name);
+  const stagesWrap=document.getElementById('detail-stages-wrap');
+  stagesWrap.innerHTML=`
+    <div style="width:100%;margin-bottom:8px">
+      <div style="font-size:11px;color:var(--t2);margin-bottom:6px">Автоматически из трекшна и календаря:</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        ${autoStages.map(s=>stageTagHtml(s)).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--t2);margin-bottom:6px">Отметить вручную (переопределить):</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${STAGES.map(s=>{
+          const active=d.stages&&d.stages.includes(s);
+          return `<button class="stage-btn${active?' done':''}" onclick="toggleStage(this,'${s}')">${active?'✓ ':''}${s}</button>`;
+        }).join('')}
+      </div>
+    </div>`;
+  // Smart goal
+  document.getElementById('d-smart-goal').value=d.smartGoal||'';
+  // Default show weeks tab
+  showTractionTab('weeks');
+  // Tasks and plan table
+  setTimeout(()=>{renderDetailTasks();renderPlanTable();},50);
+}
+
+function closeDetail(){
+  document.getElementById('mentee-grid').style.display='grid';
+  document.getElementById('mentee-detail').style.display='none';
+  renderMentees();
+}
+
+function toggleStage(el,stage){
+  if(!currentMentee)return;
+  if(!menteeDetails[currentMentee])menteeDetails[currentMentee]={};
+  if(!menteeDetails[currentMentee].stages)menteeDetails[currentMentee].stages=[];
+  const idx=menteeDetails[currentMentee].stages.indexOf(stage);
+  if(idx>=0){menteeDetails[currentMentee].stages.splice(idx,1);el.className='stage-btn';el.textContent=stage;}
+  else{menteeDetails[currentMentee].stages.push(stage);el.className='stage-btn done';el.textContent='✓ '+stage;}
+  save();
+}
+
+function updateProgress(){
+  const val=parseInt(document.getElementById('d-progress').value);
+  document.getElementById('d-progress-val').textContent=val+'%';
+  document.getElementById('d-progress-bar').style.width=val+'%';
+  if(!currentMentee)return;
+  if(!menteeDetails[currentMentee])menteeDetails[currentMentee]={};
+  menteeDetails[currentMentee].progress=val;
+  save();
+}
+
+function renderPlanTable(){
+  if(!currentMentee)return;
+  const d=menteeDetails[currentMentee]||{};
+  // Try loading from Firebase first (mentee may have filled it)
+  fetch(FB+'/data/mdetails/'+encodeURIComponent(currentMentee)+'/actionPlan.json?t='+Date.now())
+    .then(r=>r.ok?r.json():null)
+    .then(fbPlan=>{
+      // Merge: use Firebase version if exists, else local
+      const plan=fbPlan&&fbPlan.length?fbPlan:(d.actionPlan||[]);
+      if(fbPlan&&fbPlan.length){
+        menteeDetails[currentMentee].actionPlan=fbPlan;
+        save();
+      }
+      renderPlanTableFromData(plan);
+    })
+    .catch(()=>renderPlanTableFromData(d.actionPlan||[]));
+}
+
+function renderPlanTableFromData(plan){
+  const tbody=document.getElementById('d-plan-tbody');
+  if(!tbody)return;
+  if(!plan.length){
+    tbody.innerHTML=`<tr><td colspan="5" style="padding:12px;text-align:center;color:var(--t2);font-size:13px">Нет строк — нажми "+ Строка" чтобы добавить</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=plan.map((row,i)=>`
+    <tr>
+      <td style="padding:4px;border:0.5px solid rgba(28,28,26,.1)"><input type="text" value="${(row.activity||'').replace(/"/g,'&quot;')}" placeholder="Деятельность..." style="width:100%;padding:5px;border:none;font-size:13px;font-family:inherit" onchange="updatePlanRow(${i},'activity',this.value)"></td>
+      <td style="padding:4px;border:0.5px solid rgba(28,28,26,.1)"><input type="text" value="${(row.indicator||'').replace(/"/g,'&quot;')}" placeholder="Индикатор..." style="width:100%;padding:5px;border:none;font-size:13px;font-family:inherit" onchange="updatePlanRow(${i},'indicator',this.value)"></td>
+      <td style="padding:4px;border:0.5px solid rgba(28,28,26,.1)"><input type="text" value="${(row.budget||'').replace(/"/g,'&quot;')}" placeholder="Бюджет/ресурсы..." style="width:100%;padding:5px;border:none;font-size:13px;font-family:inherit" onchange="updatePlanRow(${i},'budget',this.value)"></td>
+      <td style="padding:4px;border:0.5px solid rgba(28,28,26,.1)"><input type="text" value="${(row.deadline||'').replace(/"/g,'&quot;')}" placeholder="Срок..." style="width:100%;padding:5px;border:none;font-size:13px;font-family:inherit" onchange="updatePlanRow(${i},'deadline',this.value)"></td>
+      <td style="padding:4px;border:0.5px solid rgba(28,28,26,.1);text-align:center"><button class="btn-red" style="padding:2px 6px;font-size:11px" onclick="deletePlanRow(${i})">✕</button></td>
+    </tr>`).join('');
+}
+
+function savePlanToFB(){if(!currentMentee)return;const plan=(menteeDetails[currentMentee]||{}).actionPlan||[];fetch(FB+"/data/mdetails/"+encodeURIComponent(currentMentee)+"/actionPlan.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(plan)}).catch(()=>{});}
+function addPlanRow(){
+  if(!currentMentee)return;
+  if(!menteeDetails[currentMentee])menteeDetails[currentMentee]={};
+  if(!menteeDetails[currentMentee].actionPlan)menteeDetails[currentMentee].actionPlan=[];
+  menteeDetails[currentMentee].actionPlan.push({activity:'',indicator:'',budget:'',deadline:''});
+  save();renderPlanTable();
+}
+
+function updatePlanRow(i,field,val){
+  if(!currentMentee)return;
+  if(!menteeDetails[currentMentee]||!menteeDetails[currentMentee].actionPlan)return;
+  menteeDetails[currentMentee].actionPlan[i][field]=val;
+  save();
+  // Save to Firebase so mentee can see it
+  const plan=menteeDetails[currentMentee].actionPlan;
+  fetch(FB+'/data/mdetails/'+encodeURIComponent(currentMentee)+'/actionPlan.json',{
+    method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(plan)
+  }).catch(()=>{});
+}
+
+function deletePlanRow(i){
+  if(!currentMentee)return;
+  menteeDetails[currentMentee].actionPlan.splice(i,1);
+  save();renderPlanTable();
+}
+
+function refreshProgressDisplay(){
+  if(!currentMentee)return;
+  const d=menteeDetails[currentMentee]||{};
+  const prog=d.progress||0;
+  document.getElementById('d-progress-bar').style.width=prog+'%';
+  document.getElementById('d-progress-val').textContent=prog+'%';
+  document.getElementById('d-progress').value=prog;
+  const autoEl=document.getElementById('d-progress-auto');
+  if(autoEl&&prog>0){
+    autoEl.innerHTML=`<span style="font-size:22px;font-weight:500;color:var(--blue)">${prog}%</span>`;
+  }
+}
+
+let saveTimer=null;
+function autoSaveDetail(){
+  if(!currentMentee)return;
+  if(!menteeDetails[currentMentee])menteeDetails[currentMentee]={};
+  menteeDetails[currentMentee].phone=document.getElementById('d-phone').value;
+  menteeDetails[currentMentee].bizInfo=document.getElementById('d-biz-info').value;
+  menteeDetails[currentMentee].diagnosis=document.getElementById('d-diagnosis').value;
+  menteeDetails[currentMentee].plan=document.getElementById('d-plan').value;
+  menteeDetails[currentMentee].agreements=document.getElementById('d-agreements').value;
+  menteeDetails[currentMentee].notes=document.getElementById('d-notes').value;
+  menteeDetails[currentMentee].smartGoal=document.getElementById('d-smart-goal').value;
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{save();document.getElementById('detail-saved').textContent='✓ Сохранено автоматически';setTimeout(()=>document.getElementById('detail-saved').textContent='',2000);},700);
+}
+
+// ============ CALENDAR ============
+function renderCalendar(){
+  const months=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  document.getElementById('cal-title').textContent=months[calMonth]+' '+calYear;
+  const grid=document.getElementById('cal-grid');
+  const days=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  let html=days.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+  const first=new Date(calYear,calMonth,1);
+  const last=new Date(calYear,calMonth+1,0);
+  let startDay=(first.getDay()+6)%7;
+  const today=new Date();
+  for(let i=0;i<startDay;i++){
+    const d=new Date(calYear,calMonth,-(startDay-i-1));
+    html+=`<div class="cal-day other-month"><div class="cal-day-num">${d.getDate()}</div></div>`;
+  }
+  for(let d=1;d<=last.getDate();d++){
+    const dateStr=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const dayEvents=events.filter(e=>e.date===dateStr);
+    const isToday=today.getDate()===d&&today.getMonth()===calMonth&&today.getFullYear()===calYear;
+    html+=`<div class="cal-day${isToday?' today':''}" onclick="openAddEvent('${dateStr}')">
+      <div class="cal-day-num">${d}</div>
+      ${dayEvents.map(e=>`<div class="cal-event${e.done?' done-ev':''}" style="background:${TYPE_COLORS[e.type]};color:${TYPE_TEXT[e.type]}" onclick="event.stopPropagation();toggleEventDone('${e.id}')" title="${e.done?'Отметить как не проведено':'Отметить как проведено'}">${e.done?'✓ ':''  }${e.time?e.time.substring(0,5)+' ':''  }${e.desc}</div>`).join('')}
+    </div>`;
+  }
+  grid.innerHTML=html;
+  renderEventsList();
+}
+
+function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+
+function calcDuration(){
+  const t1=document.getElementById('ev-time').value;
+  const t2=document.getElementById('ev-time-end').value;
+  if(!t1||!t2)return;
+  const [h1,m1]=t1.split(':').map(Number);
+  const [h2,m2]=t2.split(':').map(Number);
+  const mins=(h2*60+m2)-(h1*60+m1);
+  if(mins<=0){document.getElementById('ev-duration').textContent='—';return;}
+  const h=Math.floor(mins/60),m=mins%60;
+  document.getElementById('ev-duration').textContent=(h?h+' ч ':'')+(m?m+' мин':'');
+  document.getElementById('ev-duration').dataset.hours=(mins/60).toFixed(2);
+}
+
+function openAddEvent(date=''){
+  document.getElementById('add-event-form').style.display='block';
+  document.getElementById('ev-edit-id').value='';
+  document.getElementById('ev-form-title').textContent='Добавить событие';
+  if(date)document.getElementById('ev-date').value=date;
+  document.getElementById('ev-desc').value='';
+  document.getElementById('ev-place').value='';
+  document.getElementById('ev-ok').textContent='';
+  document.getElementById('ev-time').value='10:00';
+  document.getElementById('ev-time-end').value='11:00';
+  calcDuration();
+}
+function closeAddEvent(){document.getElementById('add-event-form').style.display='none';}
+
+function makeGCalLink(ev){
+  // Build Google Calendar URL
+  const date=ev.date.replace(/-/g,'');
+  const timeStart=ev.time?ev.time.replace(':','')+'00':'000000';
+  const timeEnd=ev.timeEnd?ev.timeEnd.replace(':','')+'00':String(parseInt(timeStart.substring(0,2))+1).padStart(2,'0')+timeStart.substring(2);
+  const start=date+'T'+timeStart;
+  const end=date+'T'+timeEnd;
+  const title=encodeURIComponent(ev.desc+(ev.mentee&&ev.mentee!=='all'&&ev.mentee!=='project'?' — '+ev.mentee:''));
+  const loc=encodeURIComponent(ev.place||'');
+  const details=encodeURIComponent(
+    (ev.mentee&&ev.mentee!=='all'?'Менти: '+ev.mentee+'\n':'')
+    +(ev.mentee==='all'?'Группа: все менти\n':'')
+    +'Тип: '+(TYPE_NAMES[ev.type]||ev.type)
+  );
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${loc}`;
+}
+
+function saveEvent(){
+  const date=document.getElementById('ev-date').value;
+  const desc=document.getElementById('ev-desc').value.trim();
+  if(!date||!desc){document.getElementById('ev-ok').textContent='Заполните дату и описание';return;}
+  const editId=document.getElementById('ev-edit-id').value;
+  const durEl=document.getElementById('ev-duration');
+  const hours=parseFloat(durEl.dataset.hours)||1;
+  const ev={
+    id:editId||Date.now().toString(),
+    date,
+    time:document.getElementById('ev-time').value,
+    timeEnd:document.getElementById('ev-time-end').value,
+    hours:Math.round(hours*10)/10,
+    type:document.getElementById('ev-type').value,
+    mentee:document.getElementById('ev-mentee').value,
+    desc,
+    place:document.getElementById('ev-place').value,
+    done:false
+  };
+  if(editId){const idx=events.findIndex(e=>e.id===editId);if(idx>=0)events[idx]={...events[idx],...ev};}
+  else events.push(ev);
+  save();
+  // Открываем Google Calendar
+  const gcLink=makeGCalLink(ev);
+  document.getElementById('ev-ok').innerHTML=`✓ Сохранено &nbsp;<a href="${gcLink}" target="_blank" style="background:#4285F4;color:#fff;padding:4px 10px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:500">📅 Добавить в Google Calendar</a>`;
+  setTimeout(()=>{closeAddEvent();renderCalendar();renderOverview();renderOverviewIfActive();},3000);
+}
+
+function renderOverviewIfActive(){if(document.getElementById("page-overview").classList.contains("active"))renderOverview();}
+
+const EV_TO_TIME = {meeting:'meeting',visit:'visit',call:'consult',project:'meeting',partner:'meeting',deadline:'prep',other:'prep'};
+
+function toggleEventDone(id){
+  const ev=events.find(e=>e.id===id);
+  if(!ev)return;
+  ev.done=!ev.done;
+  if(ev.done){
+    // Автоматически добавляем в таймшит
+    const alreadyLogged=timeEntries.find(t=>t.fromEventId===ev.id);
+    if(!alreadyLogged){
+      timeEntries.push({
+        id:Date.now().toString(),
+        fromEventId:ev.id,
+        date:ev.date,
+        hours:ev.hours||1,
+        type:EV_TO_TIME[ev.type]||'meeting',
+        mentee:ev.mentee==='project'||ev.mentee==='all'?'Все/Группа':ev.mentee,
+        desc:ev.desc+(ev.time?' ('+ev.time+(ev.timeEnd?'–'+ev.timeEnd:'')+')':'')+(ev.place?' · '+ev.place:'')
+      });
+    }
+  } else {
+    // Если отменяем — удаляем запись из таймшита
+    timeEntries=timeEntries.filter(t=>t.fromEventId!==ev.id);
+  }
+  save();renderCalendar();renderOverview();
+}
+
+function deleteEvent(id){events=events.filter(e=>e.id!==id);save();renderCalendar();renderOverview();}
+
+function renderEventsList(){
+  const el=document.getElementById('events-list');
+  const sorted=[...events].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(!sorted.length){el.innerHTML='<p style="font-size:13px;color:var(--t2)">Событий пока нет</p>';return;}
+  el.innerHTML=sorted.map(e=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid rgba(28,28,26,.06)${e.done?';opacity:.6':''}">
+      <div style="min-width:75px;font-size:12px;color:var(--t2)">${new Date(e.date).toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}${e.time?' '+e.time.substring(0,5)+(e.timeEnd?'–'+e.timeEnd.substring(0,5):''  ):''}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500${e.done?';text-decoration:line-through':''}">${e.desc}</div>
+        <div style="font-size:12px;color:var(--t2)">${e.mentee==='all'?'Все менти':e.mentee==='project'?'Встреча проекта':e.mentee}${e.place?' · '+e.place:''}</div>
+      </div>
+      <span class="tag" style="background:${TYPE_COLORS[e.type]};color:${TYPE_TEXT[e.type]};white-space:nowrap">${TYPE_NAMES[e.type]||''}</span>
+      <a href="${makeGCalLink(e)}" target="_blank" style="display:inline-flex;align-items:center;padding:4px 8px;background:#4285F4;color:#fff;border-radius:var(--rm);font-size:11px;text-decoration:none;white-space:nowrap" title="Добавить в Google Calendar">📅</a>
+      <button class="${e.done?'btn-o btn-sm':'btn-green btn-sm'}" onclick="toggleEventDone('${e.id}')" style="white-space:nowrap">${e.done?'↩ Вернуть':'✓ Проведено'}</button>
+      <button class="btn-red" onclick="deleteEvent('${e.id}')">✕</button>
+    </div>`).join('');
+}
+
+// ============ TIMESHEET ============
+function renderTimesheet(){
+  const now=new Date();
+  const total=(END-START)/(7*24*3600*1000);
+  const done=Math.max(0,Math.min(total,(now-START)/(7*24*3600*1000)));
+  const pct=Math.min(100,Math.round(done/total*100));
+  document.getElementById('ts-prog-bar').style.width=pct+'%';
+  document.getElementById('ts-prog-label').textContent=Math.min(8,Math.floor(done))+' из 8 недель ('+pct+'%)';
+
+  // Time totals — include events duration estimate
+  const totals={diag:0,train:0,consult:0,visit:0,meeting:0,report:0,prep:0};
+  timeEntries.forEach(t=>{totals[t.type]=(totals[t.type]||0)+t.hours;});
+  const ttGrid=document.getElementById('ttype-grid');
+  const ttData=[
+    {key:'diag',label:'Диагностика',col:'#185FA5',bg:'#E6F1FB'},
+    {key:'train',label:'Тренинги',col:'#1D9E75',bg:'#EAF3DE'},
+    {key:'consult',label:'Консультации',col:'#BA7517',bg:'#FAEEDA'},
+    {key:'visit',label:'Выезды',col:'#0F6E56',bg:'#E1F5EE'},
+    {key:'meeting',label:'Встречи',col:'#7F77DD',bg:'#EEEDFE'},
+    {key:'report',label:'Отчётность',col:'#993556',bg:'#FBEAF0'},
+    {key:'prep',label:'Подготовка',col:'#5f5e5a',bg:'#f1efe8'},
+  ];
+  ttGrid.innerHTML=ttData.map(t=>`
+    <div style="background:${t.bg};border-radius:var(--rm);padding:12px;text-align:center">
+      <div style="font-size:10px;color:${t.col};font-weight:500;text-transform:uppercase;margin-bottom:4px">${t.label}</div>
+      <div style="font-size:22px;font-weight:500;color:${t.col}">${totals[t.key]||0}ч</div>
+    </div>`).join('');
+
+  // TOTAL HOURS SUMMARY
+  const grandTotal=Object.values(totals).reduce((s,v)=>s+v,0);
+  const existingSummary=document.getElementById('ts-total-summary');
+  const summaryHtml=`<div id="ts-total-summary" style="margin-top:1rem;background:var(--blu);border-radius:var(--rl);padding:1rem;display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-size:11px;color:var(--bld);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Общий учёт времени</div>
+      <div style="font-size:28px;font-weight:500;color:var(--blue)">${grandTotal} часов</div>
+    </div>
+    <div style="text-align:right;font-size:12px;color:var(--bld);line-height:1.8">
+      ${ttData.filter(t=>totals[t.key]>0).map(t=>`<div>${t.label}: <strong>${totals[t.key]}ч</strong></div>`).join('')}
+    </div>
+  </div>`;
+  if(existingSummary) existingSummary.outerHTML=summaryHtml;
+  else document.getElementById('ttype-grid').insertAdjacentHTML('afterend', summaryHtml);
+
+  // Time log
+  const log=document.getElementById('time-log');
+  if(!timeEntries.length){log.innerHTML='';return;}
+  const total_h=timeEntries.reduce((s,t)=>s+t.hours,0);
+  log.innerHTML=`<div style="font-size:13px;font-weight:500;margin-bottom:8px">История записей · Итого: <span style="color:var(--blue)">${total_h}ч</span></div>`+
+    [...timeEntries].reverse().map(t=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid rgba(28,28,26,.06)">
+      <span style="font-size:12px;color:var(--t2);min-width:75px">${new Date(t.date).toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}</span>
+      <span class="tag" style="background:${({diag:'#E6F1FB',train:'#EAF3DE',consult:'#FAEEDA',visit:'#E1F5EE',meeting:'#EEEDFE',report:'#FBEAF0',prep:'var(--bg2)'})[t.type]};color:${TIME_COLORS[t.type]||'var(--t2)'}">${TIME_TYPES[t.type]}</span>
+      <span style="font-size:13px;flex:1">${t.desc||t.mentee}</span>
+      <span style="font-size:13px;font-weight:500;color:var(--blue)">${t.hours}ч</span>
+      <button class="btn-red" onclick="deleteTimeEntry('${t.id}')">✕</button>
+    </div>`).join('');
+
+  // Weeks — mentor's personal timesheet with editable direction and time logging
+  const wl=document.getElementById('weeks-list');
+  const weekNotes=JSON.parse(localStorage.getItem('zw_week_notes')||'{}');
+  const weekDirections=JSON.parse(localStorage.getItem('zw_week_directions')||'{}');
+  wl.innerHTML=WEEKS.map(w=>{
+    const wStart=new Date(2026,4,20+(w.n-1)*7);
+    const wEnd=new Date(2026,4,20+w.n*7);
+    const isDone=now>wEnd;
+    const isActive=now>=wStart&&now<wEnd;
+    const wEntries=timeEntries.filter(t=>{const d=new Date(t.date);return d>=wStart&&d<wEnd;});
+    const wHours=wEntries.reduce((s,t)=>s+t.hours,0);
+    const note=weekNotes[w.n]||'';
+    const direction=weekDirections[w.n]||w.focus;
+    const wEvents=events.filter(e=>{const d=new Date(e.date);return d>=wStart&&d<wEnd;});
+    const wTasks=tasks.filter(t=>t.due&&new Date(t.due)>=wStart&&new Date(t.due)<wEnd&&t.mentee!=='all'&&!t.isGroup);
+    const defaultDate=wStart.toISOString().split('T')[0];
+
+    return `<div class="week-row" style="grid-template-columns:70px 1fr">
+      <div class="week-label">Нед. ${w.n}<br><span style="font-size:10px;color:${isDone?'#27500A':isActive?'var(--blue)':'var(--t2)'}">${isDone?'✓':isActive?'▶':'○'}</span></div>
+      <div class="week-bar${isDone?' wdone':isActive?' wactive':''}" style="padding:10px 12px">
+
+        <!-- Header: dates + total hours -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:12px;font-weight:500;color:var(--t1)">${w.dates}</span>
+          <span style="font-size:13px;font-weight:500;color:${wHours>0?'var(--blue)':'var(--t2)'}">${wHours>0?wHours+'ч потрачено':'нет записей'}</span>
+        </div>
+
+        <!-- Editable direction -->
+        <input type="text" value="${direction.replace(/"/g,'&quot;')}"
+          placeholder="Направление работы на неделю..."
+          style="width:100%;padding:5px 8px;font-size:12px;border:0.5px solid rgba(28,28,26,.2);border-radius:var(--rm);background:rgba(255,255,255,.7);margin-bottom:8px"
+          onchange="saveWeekDirection(${w.n},this.value)">
+
+        <!-- Quick time entry for this week -->
+        <div style="display:grid;grid-template-columns:1fr 80px 1fr auto;gap:6px;margin-bottom:8px;align-items:end">
+          <div>
+            <div style="font-size:10px;color:var(--t2);margin-bottom:3px">Дата</div>
+            <input type="date" id="wdate-${w.n}" value="${defaultDate}" style="padding:5px 8px;font-size:12px;width:100%">
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--t2);margin-bottom:3px">Часов</div>
+            <input type="number" id="whours-${w.n}" min="0.5" max="12" step="0.5" value="1" style="padding:5px 8px;font-size:12px;width:100%">
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--t2);margin-bottom:3px">Вид работы</div>
+            <select id="wtype-${w.n}" style="padding:5px 8px;font-size:12px;width:100%">
+              <option value="diag">Диагностика</option>
+              <option value="train">Тренинг</option>
+              <option value="consult">Консультация</option>
+              <option value="visit">Выезд</option>
+              <option value="meeting">Встреча</option>
+              <option value="report">Отчётность</option>
+              <option value="prep">Подготовка</option>
+            </select>
+          </div>
+          <button class="btn btn-sm" onclick="addWeekTimeEntry(${w.n})" style="margin-top:auto">+ Добавить</button>
+        </div>
+
+        <!-- Entries for this week -->
+        ${wEntries.length?`<div style="margin-bottom:8px">
+          ${wEntries.map(t=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:0.5px solid rgba(28,28,26,.05);font-size:12px">
+            <span style="color:var(--t2);min-width:65px">${new Date(t.date).toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}</span>
+            <span class="tag" style="font-size:10px;background:${({diag:'#E6F1FB',train:'#EAF3DE',consult:'#FAEEDA',visit:'#E1F5EE',meeting:'#EEEDFE',report:'#FBEAF0',prep:'var(--bg2)'})[t.type]};color:${TIME_COLORS[t.type]||'var(--t2)'}">${TIME_TYPES[t.type]||t.type}</span>
+            <span style="flex:1;color:var(--t1)">${t.desc||''}</span>
+            <span style="font-weight:500;color:var(--blue)">${t.hours}ч</span>
+            <button class="btn-red" style="padding:2px 6px;font-size:11px" onclick="deleteTimeEntry('${t.id}')">✕</button>
+          </div>`).join('')}
+        </div>`:''}
+
+        <!-- Events and tasks this week -->
+        ${wEvents.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px">${wEvents.map(e=>`<span class="tag" style="font-size:10px;background:${TYPE_COLORS[e.type]};color:${TYPE_TEXT[e.type]}">${e.done?'✓ ':''}${e.desc.substring(0,22)}</span>`).join('')}</div>`:''}
+        ${wTasks.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px">${wTasks.map(t=>`<span class="tag ${t.done?'tag-green':'tag-amber'}" style="font-size:10px">${t.done?'✓ ':''}${t.text.substring(0,25)}</span>`).join('')}</div>`:''}
+
+        <!-- Notes -->
+        <input type="text" value="${note}" placeholder="Заметка к неделе..."
+          style="width:100%;padding:4px 8px;font-size:11px;border:0.5px solid rgba(28,28,26,.15);border-radius:var(--rm);background:rgba(255,255,255,.5);color:var(--t2)"
+          onchange="saveWeekNote(${w.n},this.value)">
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============ TRACTION ============
+const TRACTION_DIAG = [
+  {section:'В чём социальность предприятия?', questions:[
+    '1. В чём социальность вашего предприятия? Какую социальную проблему решает бизнес?'
+  ]},
+  {section:'Краткая информация о компании', questions:[
+    '1. Краткая предыстория — как начинался бизнес?'
+  ]},
+  {section:'Продукт', questions:[
+    '1. Какую проблему решает продукт (услуга)? Расскажите о продукте.',
+    '2. Кому продают продукт (услугу)? Кто целевая аудитория? Какая география клиентов?',
+    '3. Какой средний чек и как устроено ценообразование?',
+    '4. Знает ли своё ценностное предложение, УТП, конкурентное преимущество?',
+    '5. Какие основные показатели в бизнесе — выручка, прибыль? Имеются ли данные за последний месяц/год/несколько лет?',
+    '6. Какие услуги/продукты в разработке или планах? Как часто появляются новые продукты?',
+    '7. Есть ли у компании/собственника права на интеллектуальную собственность?'
+  ]},
+  {section:'Маркетинг и продажи', questions:[
+    '1. Через какие каналы привлекают клиентов сейчас?',
+    '2. Какие каналы продаж уже проверили? Какой основной на данный момент?',
+    '3. Сколько тратят на привлечение клиентов?',
+    '4. Сколько клиентов в топовый месяц?',
+    '5. Сколько клиентов в год?',
+    '6. Расскажите про конкретного самого удовлетворённого/желанного клиента — что вы знаете о своих клиентах?'
+  ]},
+  {section:'Команда', questions:[
+    '1. Кто есть в команде? Распределение ролей? Кто главный?',
+    '2. Сколько учредителей и каковы доли компании?',
+    '3. Работает ли CEO над проектом фулл-тайм?',
+    '4. Сколько часов в день уделяет бизнесу (если не фулл-тайм)?',
+    '5. Каких компетенций не хватает в команде?',
+    '6. Есть ли в команде инвестор? Какую роль играет? Является ли его решение блокирующим или критичным?'
+  ]},
+  {section:'Финансы', questions:[
+    '1. Какова форма регистрации, тип социального предприятия?',
+    '2. Ведётся ли вся необходимая бухгалтерская документация? Сдаются ли отчёты?',
+    '3. Имеется ли отчёт о прибылях и убытках?'
+  ]},
+  {section:'Мотивация и цели', questions:[
+    '1. Какие цели на 2026 год?',
+    '2. Есть ли стратегия развития и на какой срок?',
+    '3. Зачем делает этот бизнес — выясняем мотивацию?',
+    '4. Есть ли запрос на инвестиции и в каком размере?',
+    '5. Сколько денег уже потрачено на бизнес?',
+    '6. Как долго занимается этим продуктом/услугой?',
+    '7. Сколько денег уходит на проект в месяц?',
+    '8. Есть ли у основателей другой бизнес в приоритете, из-за которого могут бросить этот?',
+    '9. Исходя из ответов выше — сформулируйте ЦЕЛЬ НА ТРЕКШН. Почему такая цель?'
+  ]},
+  {section:'Итоговые вопросы', questions:[
+    '1. Какие барьеры на пути развития бизнеса?',
+    '2. Как пробовали ранее эти барьеры преодолевать?',
+    '3. Имеются ли проблемы, связанные с экологией? Нет ли негативного воздействия?',
+    '4. Что действительно может помочь расти и преодолеть препятствия?'
+  ]},
+  {section:'Диагностика ментора', questions:[
+    '1. Какая основная (глубинная) проблема в бизнесе? Напишите одну или несколько, если есть.',
+    '2. Что можно сделать с командой за время менторинга? Стратегия ментора.',
+    '3. Ближайшая точка роста? Что качественно изменится при её достижении? Это Quick Win? Если нет — что может быть Quick Win?',
+    '4. Какой артефакт подтвердит экзекьюшен / точку перехода?',
+    '5. На что стоит обратить особое внимание?'
+  ]}
+];
+
+const TRACTION_WEEKS = [
+  {n:1, label:'Неделя 1 (20–26 мая)', focus:'Диагностика и знакомство'},
+  {n:2, label:'Неделя 2 (27 мая – 2 июня)', focus:'Выездная диагностика'},
+  {n:3, label:'Неделя 3 (3–9 июня)', focus:'Диагностика Каракол и Бишкек'},
+  {n:4, label:'Неделя 4 (10–16 июня)', focus:'Тренинг — Бизнес-модель'},
+  {n:5, label:'Неделя 5 (17–23 июня)', focus:'Индивидуальные консультации'},
+  {n:6, label:'Неделя 6 (24–30 июня)', focus:'Тренинг — Маркетинг'},
+  {n:7, label:'Неделя 7 (1–7 июля)', focus:'Разработка планов действий'},
+  {n:8, label:'Неделя 8 (8–10 июля)', focus:'Финальные встречи и итоги'}
+];
+
+const SCORE_LABELS = {
+  0:'0 — Не явился на встречу',
+  3:'3 — Не проверил гипотезы, не продвинулся',
+  4:'4 — Сделал не совсем то или без артефактов',
+  5:'5 — Сделал всё запланированное с артефактами'
+};
+
+function showTractionTab(tab){
+  document.getElementById('traction-diag').style.display=tab==='diag'?'block':'none';
+  document.getElementById('traction-weeks').style.display=tab==='weeks'?'block':'none';
+  document.getElementById('tt-diag').classList.toggle('on',tab==='diag');
+  document.getElementById('tt-weeks').classList.toggle('on',tab==='weeks');
+  if(tab==='diag') renderTractionDiag();
+  if(tab==='weeks') renderTractionWeeks();
+}
+
+function renderTractionDiag(){
+  if(!currentMentee)return;
+  const d=menteeDetails[currentMentee]||{};
+  const answers=d.tractionDiag||{};
+  // Load mentee's self-filled answers from Firebase
+  fetch(FB+'/data/mdetails/'+encodeURIComponent(currentMentee)+'/diagAnswers.json?t='+Date.now())
+    .then(r=>r.ok?r.json():null)
+    .then(menteeAnswers=>{
+      const merged={...answers,...(menteeAnswers||{})};
+      buildTractionDiagForm(merged);
+    }).catch(()=>buildTractionDiagForm(answers));
+}
+
+function buildTractionDiagForm(answers){
+  const menteeFilledCount=Object.values(answers).filter(v=>v&&v.trim().length>3).length;
+  const html=(menteeFilledCount>0?`<div style="background:#EAF3DE;border-radius:var(--rm);padding:8px 12px;font-size:13px;color:#27500A;margin-bottom:12px">✓ Менти заполнили ${menteeFilledCount} ответов самостоятельно</div>`:'')
+  +TRACTION_DIAG.map(s=>`
+    <div style="margin-bottom:1rem">
+      <div style="font-size:12px;font-weight:500;color:var(--blue);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;padding:6px 10px;background:var(--blu);border-radius:var(--rm)">${s.section}</div>
+      ${s.questions.map((q,qi)=>{
+        const key=s.section+'_'+qi;
+        return `<div style="margin-bottom:8px">
+          <div style="font-size:12px;color:var(--t2);margin-bottom:4px">${q}</div>
+          <textarea rows="2" placeholder="Ответ менти..." 
+            style="width:100%;padding:7px 10px;border:0.5px solid rgba(28,28,26,.2);border-radius:var(--rm);font-size:13px;background:#fff;font-family:inherit;resize:vertical"
+            onchange="saveTractionDiag('${key}',this.value)">${answers[key]||''}</textarea>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+  document.getElementById('traction-diag-form').innerHTML=html;
+}
+
+function saveTractionDiag(key,val){
+  if(!currentMentee)return;
+  if(!menteeDetails[currentMentee])menteeDetails[currentMentee]={};
+  if(!menteeDetails[currentMentee].tractionDiag)menteeDetails[currentMentee].tractionDiag={};
+  menteeDetails[currentMentee].tractionDiag[key]=val;
+  save();
+}
+
+function renderTractionWeeks(){
+  if(!currentMentee)return;
+  const d=menteeDetails[currentMentee]||{};
+  const weekData=d.tractionWeeks||{};
+  document.getElementById('d-smart-goal').value=d.smartGoal||'';
+
+  const myTasks=tasks.filter(t=>t.mentee===currentMentee||t.mentee===(MENTEES_DATA.find(m=>m.name===currentMentee)||{}).short);
+  const m=MENTEES_DATA.find(x=>x.name===currentMentee);
+  const phone=(m&&menteeDetails[m.name])?menteeDetails[m.name].phone:'';
+  const waPhone=phone.replace(/[^0-9]/g,'');
+
+  // Get scores from Firebase for this mentee — map by iteration number
+  const shortName=m?m.short:currentMentee.split(' ')[0];
+  const fbMenteeScores=fbScores[shortName]||fbScores[currentMentee]||{};
+
+  // Map weeks to iterations: week N → iterations roughly (N-1)*2+1 to N*2
+  function getWeekIterScore(weekN){
+    const fromIter=(weekN-1)*2+1;
+    const toIter=weekN*2;
+    let att=0,hw=0,act=0,res=0,count=0;
+    for(let i=fromIter;i<=toIter;i++){
+      const it=fbMenteeScores[i];
+      if(it){att+=it.att||0;hw+=it.hw||0;act+=it.act||0;res+=it.res||0;count++;}
+    }
+    if(!count)return null;
+    return{att,hw,act,res,total:att+hw+act+res,iters:count};
+  }
+
+  const html=TRACTION_WEEKS.map(w=>{
+    const wd=weekData[w.n]||{};
+    const weekTasks=myTasks.filter(t=>t.tractionWeek===w.n);
+    const score=wd.score||'';
+    const fbWeekScore=getWeekIterScore(w.n);
+    const waMsg=encodeURIComponent('Здравствуйте! Я ИИ-помощник Анар 👋\n\nЗадание на неделю '+w.n+':\n'+(wd.task||''));
+    const waUrl=waPhone?`https://wa.me/${waPhone.startsWith('0')?'996'+waPhone.slice(1):waPhone}?text=${waMsg}`:'';
+
+    return `<div style="border:0.5px solid rgba(28,28,26,.12);border-radius:var(--rl);padding:1rem;margin-bottom:10px;background:#fff">
+      
+      <!-- Header -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:10px">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500;color:var(--blue)">${w.label}</div>
+          <input type="text" id="tw-focus-${w.n}" value="${(wd.focus||w.focus).replace(/"/g,'&quot;')}"
+            style="width:100%;margin-top:4px;padding:4px 8px;border:0.5px solid rgba(28,28,26,.15);border-radius:var(--rm);font-size:12px;color:var(--t2);background:var(--bg2)"
+            placeholder="Направление работы на неделю..."
+            onchange="saveTractionWeek(${w.n},'focus',this.value)">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+          <!-- Traction score -->
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--t2);margin-bottom:3px">Трекшн</div>
+            <select onchange="saveTractionWeek(${w.n},'score',this.value)" style="font-size:12px;padding:3px 6px;border-radius:var(--rm);border:0.5px solid rgba(28,28,26,.25);background:#fff">
+              <option value="">—</option>
+              <option value="0" ${score==='0'?'selected':''}>0</option>
+              <option value="3" ${score==='3'?'selected':''}>3</option>
+              <option value="4" ${score==='4'?'selected':''}>4</option>
+              <option value="5" ${score==='5'?'selected':''}>5</option>
+            </select>
+            ${score?`<div style="font-size:10px;font-weight:500;margin-top:2px;color:${score==='5'?'#27500A':score==='4'?'#633806':score==='0'?'#A32D2D':'#3C3489'}">${score==='5'?'✓ Выполнил':score==='4'?'Частично':score==='3'?'Не выполнил':'Не явился'}</div>`:''}
+          </div>
+          <!-- Firebase scores -->
+          <div style="text-align:center;background:var(--bg2);border-radius:var(--rm);padding:6px 10px;min-width:80px">
+            <div style="font-size:10px;color:var(--t2);margin-bottom:3px">Баллы дашборда</div>
+            ${fbWeekScore?`
+              <div style="font-size:18px;font-weight:500;color:var(--blue)">${fbWeekScore.total}</div>
+              <div style="font-size:10px;color:var(--t2);line-height:1.6">
+                П:${fbWeekScore.att} Д:${fbWeekScore.hw}<br>А:${fbWeekScore.act} Р:${fbWeekScore.res}
+              </div>`
+            :`<div style="font-size:12px;color:var(--t2);padding:4px 0">нет данных</div>`}
+          </div>
+        </div>
+      </div>
+
+      <!-- Task editable -->
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;color:var(--t2);font-weight:500;margin-bottom:4px">📌 Задание на неделю:</div>
+        <div style="display:flex;gap:6px">
+          <input type="text" id="tw-task-${w.n}" value="${(wd.task||'').replace(/"/g,'&quot;')}" 
+            placeholder="Задание менти на эту неделю..." 
+            style="flex:1;padding:7px 10px;border:0.5px solid rgba(28,28,26,.2);border-radius:var(--rm);font-size:13px">
+          <button class="btn btn-sm" onclick="updateTractionTask(${w.n})">💾</button>
+          ${waUrl?`<a href="${waUrl}" target="_blank" style="display:inline-flex;align-items:center;padding:7px 10px;background:#25D366;color:#fff;border-radius:var(--rm);font-size:12px;text-decoration:none;white-space:nowrap">📲 WA</a>`:''}
+        </div>
+      </div>
+
+      <!-- Done -->
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;color:var(--t2);font-weight:500;margin-bottom:4px">✅ Что сделал за спринт:</div>
+        <textarea rows="2" placeholder="Что менти сделал за эту неделю..."
+          style="width:100%;padding:7px 10px;border:0.5px solid rgba(28,28,26,.2);border-radius:var(--rm);font-size:13px;font-family:inherit;resize:vertical"
+          onchange="saveTractionWeek(${w.n},'done',this.value)">${wd.done||''}</textarea>
+      </div>
+
+      <!-- Limits -->
+      <div style="margin-bottom:6px">
+        <div style="font-size:11px;color:var(--t2);font-weight:500;margin-bottom:4px">🚧 Основные ограничения:</div>
+        <textarea rows="2" placeholder="Что мешало, какие барьеры были..."
+          style="width:100%;padding:7px 10px;border:0.5px solid rgba(28,28,26,.2);border-radius:var(--rm);font-size:13px;font-family:inherit;resize:vertical"
+          onchange="saveTractionWeek(${w.n},'limits',this.value)">${wd.limits||''}</textarea>
+      </div>
+
+      ${weekTasks.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${weekTasks.map(t=>`<span class="tag ${t.done?'tag-green':'tag-amber'}" style="font-size:10px">${t.done?'✓ ':''}${t.text.substring(0,35)}</span>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+  document.getElementById('traction-weeks-list').innerHTML=html;
+}
+
+function updateTractionTask(n){
+  const input=document.getElementById('tw-task-'+n);
+  if(!input)return;
+  saveTractionWeekTask(n,input.value);
+  // Update WA button text if present
+  renderTractionWeeks();
+}
+
+function saveTractionWeek(n,field,val){
+  if(!currentMentee)return;
+  if(!menteeDetails[currentMentee])menteeDetails[currentMentee]={};
+  if(!menteeDetails[currentMentee].tractionWeeks)menteeDetails[currentMentee].tractionWeeks={};
+  if(!menteeDetails[currentMentee].tractionWeeks[n])menteeDetails[currentMentee].tractionWeeks[n]={};
+  menteeDetails[currentMentee].tractionWeeks[n][field]=val;
+  save();
+  if(field==='score')renderTractionWeeks();
+}
+
+function saveTractionWeekTask(n,text){
+  if(!currentMentee||!text.trim())return;
+  if(!menteeDetails[currentMentee])menteeDetails[currentMentee]={};
+  if(!menteeDetails[currentMentee].tractionWeeks)menteeDetails[currentMentee].tractionWeeks={};
+  if(!menteeDetails[currentMentee].tractionWeeks[n])menteeDetails[currentMentee].tractionWeeks[n]={};
+  
+  const weekDates=['','2026-05-26','2026-06-02','2026-06-09','2026-06-16','2026-06-23','2026-06-30','2026-07-07','2026-07-10'];
+  const dueDate=weekDates[n]||'';
+  const oldTask=menteeDetails[currentMentee].tractionWeeks[n].task||'';
+  menteeDetails[currentMentee].tractionWeeks[n].task=text;
+  save();
+
+  // Update or create task
+  const existingTask=tasks.find(t=>(t.mentee===currentMentee)&&t.tractionWeek===n);
+  if(existingTask){
+    existingTask.text='Нед.'+n+': '+text;
+    existingTask.due=dueDate;
+  } else {
+    tasks.push({id:Date.now().toString(),text:'Нед.'+n+': '+text,done:false,mentee:currentMentee,due:dueDate,priority:'normal',tractionWeek:n});
+  }
+
+  // Update or create calendar event (deadline)
+  const m=MENTEES_DATA.find(x=>x.name===currentMentee);
+  const shortName=m?m.short:currentMentee.split(' ')[0];
+  const evDesc='📌 Дедлайн '+shortName+' (нед.'+n+'): '+text;
+  const existingEv=events.find(e=>e.tractionWeek===n&&e.mentee===currentMentee);
+  if(existingEv){
+    existingEv.desc=evDesc;
+    existingEv.date=dueDate;
+  } else if(dueDate){
+    events.push({
+      id:Date.now().toString(),
+      date:dueDate,
+      time:'23:59',
+      timeEnd:'',
+      hours:0,
+      type:'deadline',
+      mentee:currentMentee,
+      desc:evDesc,
+      place:'',
+      done:false,
+      tractionWeek:n
+    });
+  }
+  save();
+}
+
+function saveWeekDirection(n,val){
+  const dirs=JSON.parse(localStorage.getItem('zw_week_directions')||'{}');
+  dirs[n]=val;
+  localStorage.setItem('zw_week_directions',JSON.stringify(dirs));
+}
+
+function addWeekTimeEntry(n){
+  const date=document.getElementById('wdate-'+n).value;
+  const hours=parseFloat(document.getElementById('whours-'+n).value)||0;
+  const type=document.getElementById('wtype-'+n).value;
+  if(!date||!hours)return;
+  const desc=document.getElementById('wdate-'+n).closest('.week-bar')?.querySelector('input[type=text]')?.value||'';
+  timeEntries.push({id:Date.now().toString(),date,hours,type,mentee:'all',desc:''});
+  save();
+  renderTimesheet();
+}
+
+function saveWeekNote(n,val){
+  const notes=JSON.parse(localStorage.getItem('zw_week_notes')||'{}');
+  notes[n]=val;
+  localStorage.setItem('zw_week_notes',JSON.stringify(notes));
+}
+
+function saveTimeEntry(){
+  const date=document.getElementById('ts-date').value;
+  const hours=parseFloat(document.getElementById('ts-hours').value)||0;
+  if(!date||!hours)return;
+  timeEntries.push({id:Date.now().toString(),date,hours,type:document.getElementById('ts-type').value,mentee:document.getElementById('ts-mentee').value,desc:document.getElementById('ts-desc').value});
+  save();
+  document.getElementById('ts-ok').textContent='✓ Добавлено';
+  setTimeout(()=>document.getElementById('ts-ok').textContent='',2000);
+  document.getElementById('ts-desc').value='';
+  renderTimesheet();
+}
+function deleteTimeEntry(id){timeEntries=timeEntries.filter(t=>t.id!==id);save();renderTimesheet();}
+
+// ============ TASKS ============
+function renderTasks(){
+  const filtered=tasks.filter(t=>{
+    if(taskFilter==='active')return !t.done;
+    if(taskFilter==='done')return t.done;
+    return true;
+  }).sort((a,b)=>{
+    if(a.done!==b.done)return a.done?1:-1;
+    const pa=a.priority==='high'?0:a.priority==='low'?2:1;
+    const pb=b.priority==='high'?0:b.priority==='low'?2:1;
+    return pa-pb;
+  });
+  const el=document.getElementById('tasks-list');
+  if(!filtered.length){el.innerHTML='<p style="font-size:13px;color:var(--t2)">Задач нет</p>';return;}
+  const prioColor={high:'tag-red',normal:'tag-blue',low:'tag-gray'};
+  const prioName={high:'Высокий',normal:'Обычный',low:'Низкий'};
+
+  // Group tasks by text+due for group tasks display
+  const groupedKeys=new Set();
+  const rows=[];
+
+  filtered.forEach(t=>{
+    if(t.isGroup){
+      // Check if this group task text already shown
+      const key=t.text+'|'+t.due;
+      if(groupedKeys.has(key))return;
+      groupedKeys.add(key);
+      // Find all tasks in this group
+      const groupTasks=tasks.filter(x=>x.isGroup&&x.text===t.text&&x.due===t.due);
+      const doneCount=groupTasks.filter(x=>x.done).length;
+      const allDone=doneCount===groupTasks.length;
+      rows.push(`<div style="border:0.5px solid rgba(24,95,165,.2);border-radius:var(--rl);padding:10px 14px;margin-bottom:8px;background:var(--blu)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span class="tag tag-blue" style="font-size:10px">👥 Групповое</span>
+          <div style="flex:1;font-size:14px;font-weight:500">${t.text}</div>
+          <span style="font-size:12px;color:var(--t2)">${doneCount}/${groupTasks.length} выполнили</span>
+          ${t.due?`<span style="font-size:11px;color:var(--t2)">до ${new Date(t.due).toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}</span>`:''}
+          <button class="btn-red" onclick="deleteGroupTask('${t.text}','${t.due}')">✕</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${groupTasks.map(gt=>{
+            const gm=MENTEES_DATA.find(x=>x.name===gt.mentee);
+            const phone=gm&&menteeDetails[gm.name]?menteeDetails[gm.name].phone:'';
+            const waPhone=phone.replace(/[^0-9]/g,'');
+            const waMsg=encodeURIComponent('Здравствуйте! Я ИИ-помощник Анар 👋\n\nЗадание от ментора:\n'+gt.text+(gt.due?'\nСрок: до '+new Date(gt.due).toLocaleDateString('ru-RU',{day:'numeric',month:'long'}):''));
+            const waLink=waPhone?`https://wa.me/${waPhone.startsWith('0')?'996'+waPhone.slice(1):waPhone}?text=${waMsg}`:'';
+            return `<div style="display:flex;align-items:center;gap:5px;background:${gt.done?'#EAF3DE':'#fff'};border-radius:var(--rm);padding:5px 10px;border:0.5px solid rgba(28,28,26,.12)">
+              <div class="task-check${gt.done?' done':''}" onclick="toggleTask('${gt.id}')" style="width:16px;height:16px;font-size:10px">${gt.done?'✓':''}</div>
+              <span style="font-size:12px;${gt.done?'text-decoration:line-through;color:var(--t2)':''}${gm?';color:'+gm.color:''}">${gm?gm.initials:gt.mentee.split(' ')[0]}</span>
+              ${!gt.done?(waLink
+                ?`<a href="${waLink}" target="_blank" style="font-size:11px;color:#25D366;text-decoration:none" title="Отправить в WhatsApp">📲</a>`
+                :`<span style="font-size:10px;color:#ccc" title="Нет телефона в карточке">📲</span>`
+              ):''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`);
+    } else {
+      const m=MENTEES_DATA.find(x=>x.name===t.mentee||x.short===t.mentee);
+      const phone=m&&menteeDetails[m.name]?menteeDetails[m.name].phone:'';
+      const waPhone=phone.replace(/[^0-9]/g,'');
+      const waMsg=encodeURIComponent('Здравствуйте! Я ИИ-помощник Анар 👋\n\nЗадание от ментора:\n'+t.text+(t.due?'\nСрок: до '+new Date(t.due).toLocaleDateString('ru-RU',{day:'numeric',month:'long'}):''));
+      const waLink=waPhone?`https://wa.me/${waPhone.startsWith('0')?'996'+waPhone.slice(1):waPhone}?text=${waMsg}`:'';
+      rows.push(`<div class="task-item">
+        <div class="task-check${t.done?' done':''}" onclick="toggleTask('${t.id}')">${t.done?'✓':''}</div>
+        <div style="flex:1">
+          <div style="font-size:14px${t.done?';text-decoration:line-through;color:var(--t2)':''}">${t.text}</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:2px">
+            ${t.mentee==='all'?'📋 Общая':m?`<span style="color:${m.color}">${m.initials} ${t.mentee}</span>`:t.mentee}
+            ${t.due?' · До '+new Date(t.due).toLocaleDateString('ru-RU',{day:'numeric',month:'short'}):''}
+            <span class="tag ${prioColor[t.priority]||'tag-blue'}" style="margin-left:6px;font-size:10px">${prioName[t.priority]||''}</span>
+          </div>
+        </div>
+        ${waLink?`<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#25D366;color:#fff;border-radius:var(--rm);font-size:12px;text-decoration:none;white-space:nowrap">📲 WA</a>`:''}
+        <button class="btn-red" onclick="deleteTask('${t.id}')">✕</button>
+      </div>`);
+    }
+  });
+  el.innerHTML=rows.join('');
+}
+
+function deleteGroupTask(text,due){
+  if(!confirm('Удалить групповое задание для всех менти?'))return;
+  tasks=tasks.filter(t=>!(t.isGroup&&t.text===text&&t.due===due));
+  save();renderTasks();renderOverview();
+}
+
+// Render tasks inside mentee card
+function renderDetailTasks(){
+  if(!currentMentee)return;
+  const el=document.getElementById('d-tasks-list');
+  if(!el)return;
+  const myTasks=tasks.filter(t=>t.mentee===currentMentee||t.mentee===MENTEES_DATA.find(m=>m.name===currentMentee)?.short);
+  if(!myTasks.length){el.innerHTML='<p style="font-size:13px;color:var(--t2)">Задач пока нет</p>';return;}
+  const m=MENTEES_DATA.find(x=>x.name===currentMentee);
+  const phone=m&&menteeDetails[m.name]?menteeDetails[m.name].phone:'';
+  const waPhone=phone.replace(/[^0-9]/g,'');
+  el.innerHTML=myTasks.map(t=>{
+    const waMsg=encodeURIComponent(`Здравствуйте! Я ИИ-помощник Анар 👋
+
+Задание от ментора:
+${t.text}${t.due?'\nСрок: до '+new Date(t.due).toLocaleDateString('ru-RU',{day:'numeric',month:'long'}):''}`)  ;
+    const waLink=waPhone?`https://wa.me/${waPhone.startsWith('0')?'996'+waPhone.slice(1):waPhone}?text=${waMsg}`:'';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid rgba(28,28,26,.06)">
+      <div class="task-check${t.done?' done':''}" onclick="toggleTaskFromDetail('${t.id}')" style="flex-shrink:0">${t.done?'✓':''}</div>
+      <div style="flex:1">
+        <div style="font-size:13px${t.done?';text-decoration:line-through;color:var(--t2)':''}">${t.text}</div>
+        ${t.due?`<div style="font-size:11px;color:var(--t2)">До ${new Date(t.due).toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}</div>`:''}
+      </div>
+      ${waLink?`<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#25D366;color:#fff;border-radius:var(--rm);font-size:11px;text-decoration:none">📲 WA</a>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleTaskFromDetail(id){
+  const t=tasks.find(t=>t.id===id);
+  if(t){t.done=!t.done;save();renderDetailTasks();renderOverview();}
+}
+
+function addTaskForCurrentMentee(){
+  if(!currentMentee)return;
+  const text=prompt('Задача для '+currentMentee+':');
+  if(!text||!text.trim())return;
+  const due=prompt('Срок (дата, например 2026-06-15) или оставьте пустым:');
+  tasks.push({id:Date.now().toString(),text:text.trim(),done:false,mentee:currentMentee,due:due||'',priority:'normal'});
+  save();renderDetailTasks();renderOverview();
+}
+
+function onTaskMenteeChange(){
+  const v=document.getElementById('task-mentee').value;
+  document.getElementById('task-group-info').style.display=v==='group'?'block':'none';
+}
+
+function showAddTask(){document.getElementById('add-task-form').style.display='block';}
+function hideAddTask(){document.getElementById('add-task-form').style.display='none';}
+function saveTask(){
+  const text=document.getElementById('task-text').value.trim();
+  if(!text)return;
+  const mentee=document.getElementById('task-mentee').value;
+  const due=document.getElementById('task-due').value;
+  const priority=document.getElementById('task-priority').value;
+
+  if(mentee==='group'){
+    // Создаём задачу для каждого менти
+    MENTEES_DATA.forEach(m=>{
+      tasks.push({id:Date.now().toString()+'_'+m.short,text,done:false,mentee:m.name,due,priority,isGroup:true});
+    });
+  } else {
+    tasks.push({id:Date.now().toString(),text,done:false,mentee,due,priority});
+  }
+  save();
+  document.getElementById('task-text').value='';
+  document.getElementById('task-mentee').value='all';
+  document.getElementById('task-group-info').style.display='none';
+  hideAddTask();renderTasks();renderOverview();
+}
+function toggleTask(id){const t=tasks.find(t=>t.id===id);if(t){t.done=!t.done;save();renderTasks();renderOverview();}}
+function deleteTask(id){tasks=tasks.filter(t=>t.id!==id);save();renderTasks();renderOverview();}
+function filterTasks(f,btn){
+  taskFilter=f;
+  document.querySelectorAll('#page-tasks .btn-o.btn-sm').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');renderTasks();
+}
+
+async function exportPlans(){
+  const btn=document.querySelector('[onclick="exportPlans()"]');
+  if(btn)btn.textContent='⏳ Загружаем...';
+
+  // Load all plans from Firebase
+  const planData={};
+  await Promise.all(MENTEES_DATA.map(async m=>{
+    try{
+      const r=await fetch(FB+'/data/mdetails/'+encodeURIComponent(m.name)+'/actionPlan.json?t='+Date.now());
+      if(r.ok){const d=await r.json();if(d&&d.length)planData[m.name]=d;}
+    }catch{}
+    // Also check local
+    if(!planData[m.name]&&menteeDetails[m.name]?.actionPlan?.length)
+      planData[m.name]=menteeDetails[m.name].actionPlan;
+  }));
+
+  if(btn)btn.textContent='📋 Планы менти';
+
+  const now=new Date().toLocaleDateString('ru-RU');
+  let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="UTF-8"><title>Планы действий менти — Zhash Pro</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:12pt;color:#000;margin:2cm}
+    h1{font-size:18pt;color:#185FA5;margin-bottom:6pt}
+    h2{font-size:14pt;color:#185FA5;margin-top:18pt;margin-bottom:6pt;border-bottom:1px solid #185FA5;padding-bottom:4pt}
+    h3{font-size:12pt;color:#0C447C;margin-top:12pt;margin-bottom:4pt}
+    table{width:100%;border-collapse:collapse;margin-bottom:12pt;font-size:10pt}
+    td,th{padding:6pt 8pt;border:1px solid #ccc;vertical-align:top}
+    th{background:#E6F1FB;font-weight:bold;color:#0C447C}
+    tr:nth-child(even) td{background:#f9f9f9}
+    .no-plan{font-size:10pt;color:#888;font-style:italic}
+    .meta{font-size:10pt;color:#666;margin-bottom:18pt}
+  </style></head><body>
+  <h1>Планы действий участников</h1>
+  <p class="meta">Mentoring Zhash Pro &nbsp;|&nbsp; Сформировано: ${now} &nbsp;|&nbsp; 20 мая — 10 июля 2026</p>`;
+
+  MENTEES_DATA.forEach(m=>{
+    const plan=planData[m.name]||[];
+    const d=menteeDetails[m.name]||{};
+    const prog=d.progress||0;
+    const sc=getScores(m.short);
+    html+=`<h2>${m.name}</h2>
+    <h3>${m.biz} &nbsp;·&nbsp; ${m.city}</h3>
+    <p style="font-size:10pt;color:#555;margin-bottom:8pt">
+      Выполнение плана: <strong>${prog}%</strong> &nbsp;|&nbsp; 
+      Баллов: <strong>${sc.total}</strong> (${sc.iters} итераций)
+      ${d.smartGoal?'<br>SMART цель: <em>'+d.smartGoal+'</em>':''}
+    </p>`;
+    if(!plan.length){
+      html+=`<p class="no-plan">План действий ещё не заполнен</p>`;
+    } else {
+      html+=`<table>
+        <tr><th>№</th><th>Деятельность</th><th>Индикатор</th><th>Бюджет/Ресурсы</th><th>Срок</th></tr>
+        ${plan.map((row,i)=>`<tr>
+          <td style="text-align:center;width:24pt">${i+1}</td>
+          <td>${row.activity||'—'}</td>
+          <td>${row.indicator||'—'}</td>
+          <td>${row.budget||'—'}</td>
+          <td>${row.deadline||'—'}</td>
+        </tr>`).join('')}
+      </table>`;
+    }
+  });
+
+  html+=`<p style="font-size:9pt;color:#888;margin-top:24pt">Отчёт сформирован: ${now}</p></body></html>`;
+
+  const blob=new Blob(['\ufeff'+html],{type:'application/msword;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='zhash_plans_'+now.replace(/\./g,'-')+'.doc';
+  a.click();
+}
+
+function exportReport(){
+  // Show export options
+  const choice=confirm('Нажми OK для экспорта в Word (откроется в браузере, можно сохранить как .doc)\nНажми Отмена для экспорта в HTML');
+  if(choice) exportWord(); else exportHTML();
+}
+
+function buildReportContent(){
+  const now=new Date().toLocaleDateString('ru-RU');
+  const totalH=timeEntries.reduce((s,t)=>s+t.hours,0);
+  const evDone=events.filter(e=>e.done).length;
+  const tasksDone=tasks.filter(t=>t.done).length;
+  const totals={diag:0,train:0,consult:0,visit:0,meeting:0,report:0,prep:0};
+  timeEntries.forEach(t=>{totals[t.type]=(totals[t.type]||0)+t.hours;});
+  const TIME_TYPES_RU={diag:'Диагностика',train:'Тренинги',consult:'Консультации',visit:'Выезды',meeting:'Встречи',report:'Отчётность',prep:'Подготовка'};
+
+  let body=`<h1>Отчёт — Mentoring Zhash Pro</h1>
+  <p><em>Сформировано: ${now} &nbsp;|&nbsp; Период: 20 мая — 10 июля 2026</em></p>
+  <h2>Общая статистика</h2>
+  <table><tr><th>Показатель</th><th>Значение</th></tr>
+  <tr><td>Всего событий</td><td>${events.length}</td></tr>
+  <tr><td>Проведено встреч</td><td>${evDone}</td></tr>
+  <tr><td>Задач выполнено</td><td>${tasksDone} из ${tasks.length}</td></tr>
+  <tr><td>Часов потрачено (итого)</td><td><strong>${totalH} ч</strong></td></tr>
+  ${Object.entries(totals).filter(([k,v])=>v>0).map(([k,v])=>`<tr><td>&nbsp;&nbsp;&nbsp;${TIME_TYPES_RU[k]||k}</td><td>${v} ч</td></tr>`).join('')}
+  </table>
+  <h2>Участники программы</h2>`;
+
+  MENTEES_DATA.forEach(m=>{
+    const d=menteeDetails[m.name]||{};
+    const sc=getScores(m.short);
+    const prog=d.progress||0;
+    const myTasks=tasks.filter(t=>t.mentee===m.name||t.mentee===m.short);
+    const stagesStr=d.stages&&d.stages.length?d.stages.join(' → '):'Нет данных';
+    body+=`<h3>${m.name} — ${m.biz} (${m.city})</h3>
+    <table>
+      <tr><th colspan="2" style="background:#E6F1FB;color:#0C447C">${m.name}</th></tr>
+      <tr><td width="35%">Телефон</td><td>${d.phone||'—'}</td></tr>
+      <tr><td>Этапы работы</td><td>${stagesStr}</td></tr>
+      <tr><td>Выполнение плана</td><td>${prog}%</td></tr>
+      <tr><td>Баллов набрано</td><td>${sc.total} баллов (${sc.iters} итераций)</td></tr>
+      ${d.bizInfo?`<tr><td>О бизнесе</td><td>${d.bizInfo}</td></tr>`:''}
+      ${d.diagnosis?`<tr><td>Результаты диагностики</td><td>${d.diagnosis.replace(/\n/g,'<br>')}</td></tr>`:''}
+      ${d.plan?`<tr><td>План действий</td><td>${d.plan.replace(/\n/g,'<br>')}</td></tr>`:''}
+      ${d.agreements?`<tr><td>Договорённости</td><td>${d.agreements.replace(/\n/g,'<br>')}</td></tr>`:''}
+      ${myTasks.length?`<tr><td>Задачи</td><td>${myTasks.map(t=>(t.done?'✓ ':'○ ')+t.text).join('<br>')}</td></tr>`:''}
+      ${d.smartGoal?`<tr><td>SMART цель</td><td><strong>${d.smartGoal}</strong></td></tr>`:''}
+    </table>
+    ${d.tractionWeeks?`<h4 style="font-size:12pt;margin:8pt 0 4pt;color:#0C447C">Трекшн по неделям:</h4>
+    <table><tr><th>Неделя</th><th>Задача</th><th>Выполнено</th><th>Ограничения</th><th>Оценка</th></tr>
+    ${TRACTION_WEEKS.map(w=>{const wd=d.tractionWeeks[w.n]||{};return wd.task||wd.done?`<tr><td>${w.label}</td><td>${wd.task||''}</td><td>${wd.done||''}</td><td>${wd.limits||''}</td><td style="text-align:center;font-weight:bold;color:${wd.score==='5'?'#27500A':wd.score==='4'?'#633806':'#A32D2D'}">${wd.score||'—'}</td></tr>`:''}).join('')}
+    </table>`:''}`;
+
+  });
+
+  body+=`<h2>Календарь событий</h2>
+  <table><tr><th>Дата</th><th>Время</th><th>Описание</th><th>Тип</th><th>Менти</th><th>Статус</th></tr>`;
+  [...events].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(e=>{
+    body+=`<tr><td>${new Date(e.date).toLocaleDateString('ru-RU')}</td><td>${e.time||''}${e.timeEnd?'–'+e.timeEnd:''}</td><td>${e.desc}</td><td>${TYPE_NAMES[e.type]||''}</td><td>${e.mentee==='all'?'Все менти':e.mentee==='project'?'Встреча проекта':e.mentee}</td><td>${e.done?'✓ Проведено':'Планируется'}</td></tr>`;
+  });
+  body+=`</table>`;
+
+  body+=`<h2>Учёт рабочего времени — итого ${totalH} ч</h2>
+  <table><tr><th>Дата</th><th>Вид работы</th><th>Часов</th><th>Менти</th><th>Описание</th></tr>`;
+  [...timeEntries].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t=>{
+    body+=`<tr><td>${new Date(t.date).toLocaleDateString('ru-RU')}</td><td>${TIME_TYPES_RU[t.type]||t.type}</td><td>${t.hours}</td><td>${t.mentee}</td><td>${t.desc||''}</td></tr>`;
+  });
+  body+=`</table>`;
+  return body;
+}
+
+function exportHTML(){
+  const now=new Date().toLocaleDateString('ru-RU');
+  const content=buildReportContent();
+  const html=`<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>Отчёт Zhash Pro</title>
+  <style>body{font-family:Arial,sans-serif;max-width:900px;margin:0 auto;padding:2rem;color:#1a1a18}
+  h1{font-size:22px;margin-bottom:4px}h2{font-size:17px;margin:2rem 0 .75rem;border-bottom:2px solid #185FA5;padding-bottom:6px;color:#185FA5}
+  h3{font-size:14px;margin:1.5rem 0 6px;color:#0C447C}
+  table{width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:13px}
+  td,th{padding:7px 12px;border:1px solid #ddd;text-align:left;vertical-align:top}
+  th{background:#f5f5f3;font-weight:600}tr:nth-child(even){background:#fafafa}
+  @media print{body{padding:1rem}h2{page-break-before:auto}}
+  </style></head><body>${content}<p style="margin-top:2rem;font-size:12px;color:#888">Отчёт сформирован: ${now}</p></body></html>`;
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='zhash_report_'+now.replace(/\./g,'-')+'.html';
+  a.click();
+}
+
+function exportWord(){
+  const now=new Date().toLocaleDateString('ru-RU');
+  const content=buildReportContent();
+  // Word-compatible HTML with mso namespace
+  const wordHtml=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="UTF-8"><meta name=ProgId content=Word.Document><meta name=Generator content="Microsoft Word 15">
+  <title>Отчёт Zhash Pro</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:12pt;color:#000;margin:2cm}
+    h1{font-size:18pt;color:#185FA5;margin-bottom:6pt}
+    h2{font-size:14pt;color:#185FA5;border-bottom:1px solid #185FA5;margin-top:18pt;margin-bottom:6pt}
+    h3{font-size:12pt;color:#0C447C;margin-top:12pt}
+    table{width:100%;border-collapse:collapse;margin-bottom:12pt;font-size:10pt}
+    td,th{padding:5pt 8pt;border:1px solid #ccc;vertical-align:top}
+    th{background:#E6F1FB;font-weight:bold}
+  </style></head><body>${content}
+  <p style="font-size:9pt;color:#888;margin-top:24pt">Отчёт сформирован: ${now}</p>
+  </body></html>`;
+  const blob=new Blob(['\ufeff'+wordHtml],{type:'application/msword;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='zhash_report_'+now.replace(/\./g,'-')+'.doc';
+  a.click();
+}
+
+
+// ============ PRE-LOADED DIAGNOSTICS DATA ============
+const DIAG_DATA = {"Сопубекова Айкан": {"phone": "0703108818", "bizInfo": "Продажа ЛФК и АФК наборов, игрушек и книг", "revenue": "2400000 сом", "profit": "480000 сом", "strengths": "— У нас несколько направлений: развивающие игрушки, детские книги и АФК-наборы, что позволяет охватывать разные потребности родителей и специалистов.\n— Есть опыт офлайн-продаж на ярмарках и выстроенная работа с клиентами онлайн.\n— Мы хорошо понимаем детскую аудиторию и потребности родителей благодаря медицинскому и реабилитационному опыту.\n— Есть постоянный реализатор в магазине, что позволяет развивать стабильную офлайн-точку.\n— Мы ведём блог и формируем доверие аудитории через полезный контент о детском развитии.\n— Выпустили собственные детские книги, что помогает выделиться среди конкурентов", "problems": "— После окончания сезона ярмарок снизился основной поток продаж.\n— Онлайн-продажи пока нестабильны и требуют системного продвижения.\n— Не всегда хватает времени на развитие всех направлений одновременно.\n— Ограниченный охват аудитории и недостаточно регулярная реклама.\n— Часть клиентов пока не знает о наличии магазина и АФК-наборов.", "top3": "1. Снижение продаж после окончания сезона ярмарок.\n2. Недостаточно стабильный поток клиентов в онлайн-продажах и офлайн-магазине.\n3. Нехватка времени и ресурсов на системное продвижение бизнеса.", "opportunities": "— Развитие онлайн-продаж через Instagram, TikTok и маркетплейсы.\n— Увеличение узнаваемости через экспертный блог о развитии детей и реабилитации.\n— Выпуск авторских АФК-наборов.\n— Сотрудничество с детскими центрами, логопедами, реабилитологами и детскими садами.\n— Проведение мастер-классов, игр и мини-мероприятий для родителей и детей.", "obstacles": "— Сезонность продаж и зависимость от ярмарок.\n— Недостаток времени и ресурсов на маркетинг и создание контента.\n— Ограниченный бюджет на рекламу и расширение ассортимента.", "helpNeeded": "Финансы, Систематизация, Масштабирование, Команда", "programGoal": "— Выстроить стабильную систему продаж без зависимости от ярмарок.\n— Научиться эффективному продвижению онлайн.\n— Систематизировать работу всех направлений бизнеса.", "diagScores": {"Маркетинг": 3.3, "Финансы": 3.4, "Операции": 2.6, "Рост": 4.2, "Соц.влияние": 4.2}}, "Шайыкова Сезим Таалайбековна": {"phone": "996704604073", "bizInfo": "Частный детский сад. Работа с детьми с раннего возраста (с 10 мес), дети с ЗРР", "revenue": "8000000-9000000 сом", "profit": "2500000-3500000 сом", "strengths": "Работа с детьми ЗРР и с детьми с раннего возраста с 10 мес", "problems": "Текучка кадра, нестабильность", "top3": "1. Сезонность\n2. Клиентов мало\n3. Нехватка системы управления", "opportunities": "Открыть второй филиал", "obstacles": "Нехватка финансов", "helpNeeded": "Продажи, Маркетинг, Соцсети, Финансы, Клиенты, Масштабирование", "programGoal": "Хочу делегировать задачи, побороть страх, масштабироваться", "diagScores": {"Маркетинг": 2.8, "Финансы": 3.0, "Операции": 1.8, "Рост": 3.6, "Соц.влияние": 4.2}}, "Белеков Азамат Белекович": {"phone": "0708020307", "bizInfo": "OKUPro — образовательная платформа (Android/iOS). Более 33К скачиваний, 26К пользователей, более 300 платных пользователей. Материалы для подготовки к ОРТ, школьные книги, AI-генератор вопросов. Весь материал на 2х языках.", "revenue": "150 000 сом", "profit": "0 сом", "strengths": "Легко масштабировать в другие страны, доступность (500 сом/год), качественные материалы, актуальная информация", "problems": "Трудности с подготовкой материалов, ведение соцсетей, многие думают что это онлайн-курс", "top3": "1. Подготовить материалы для поступления в ВУЗы\n2. Собрать и вести актуальный контент\n3. Монетизация и рост платных пользователей", "opportunities": "Подключение направлений для подготовки к частным школам/ВУЗам, гос.экзаменам, олимпиадам", "obstacles": "Нехватка знаний, денег и человеческих ресурсов", "helpNeeded": "Продажи, Маркетинг, Соцсети", "programGoal": "Много знаний и мотивации для роста", "diagScores": {"Маркетинг": 3.5, "Финансы": 3.4, "Операции": 4.0, "Рост": 4.6, "Соц.влияние": 4.2}}, "Ишенбеков Бактияр": {"phone": "0705-550-450", "bizInfo": "Производство пчело-павильонов. Shifaa honey — натуральный мёд", "revenue": "1.2 млн сом", "profit": "700 тыс. сом", "strengths": "Уникальный продукт, высокое качество, налаженные продажи через Instagram и сарафанное радио, хорошая прибыльность", "problems": "Рост цен на материалы, нужно регулирование цен", "top3": "1. Регулирование цен на материалы\n2. Выход на новый уровень\n3. Расширение каналов продаж", "opportunities": "Выйти на новый уровень, масштабировать производство", "obstacles": "Практически отсутствуют — сильный бизнес", "helpNeeded": "Продажи", "programGoal": "Получить знания о продажах и масштабировании", "diagScores": {"Маркетинг": 4.4, "Финансы": 4.6, "Операции": 5.0, "Рост": 4.6, "Соц.влияние": 4.6}}, "Сүйүнүчова Насыят": {"phone": "0707650685", "bizInfo": "Akylman kids — учебный центр для детей 7-16 лет. Разные курсы на кыргызском языке.", "revenue": "150000-100000 сом", "profit": "20000-15000 сом", "strengths": "Кыргызскоязычный центр, 100% результат, безопасность учеников", "problems": "Мало клиентов, слабый маркетинг", "top3": "1. Маркетинг и привлечение клиентов\n2. Финансовая устойчивость\n3. Рост клиентской базы", "opportunities": "Через 4-5 лет превратить в большой детский сад", "obstacles": "Выгорание, нехватка энергии", "helpNeeded": "Маркетинг, Соцсети, Финансы, Клиенты", "programGoal": "Новые знания, как сохранить и развить бизнес", "diagScores": {"Маркетинг": 2.7, "Финансы": 1.4, "Операции": 2.2, "Рост": 2.8, "Соц.влияние": 3.0}}, "Майрам Райымова": {"phone": "0505616016", "bizInfo": "Массаж — оздоровление. Профессиональный массаж в Нарыне.", "revenue": "500 000 сом", "profit": "500 000 сом", "strengths": "Сильная команда, высокое качество услуг", "problems": "Нехватка помещения/места для работы", "top3": "1. Место/помещение\n2. Финансовая грамотность\n3. Расширение услуг", "opportunities": "Добавление новых услуг, расширение", "obstacles": "Нехватка помещения", "helpNeeded": "Маркетинг, Финансы, Масштабирование", "programGoal": "Обучение и развитие бизнеса", "diagScores": {"Маркетинг": 4.5, "Финансы": 3.2, "Операции": 3.8, "Рост": 4.6, "Соц.влияние": 4.4}}};
+
+// Name matching helper
+function matchMentee(rawName) {
+  const norm = s => s.toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ').trim();
+  const parts = norm(rawName).split(' ');
+  return MENTEES_DATA.find(m => {
+    const mParts = norm(m.name).split(' ');
+    return parts.some(p => p.length > 3 && mParts.some(mp => mp.includes(p) || p.includes(mp)));
+  });
+}
+
+function applyDiagData(diagEntry, menteeFullName) {
+  if(!menteeDetails[menteeFullName]) menteeDetails[menteeFullName] = {};
+  const d = menteeDetails[menteeFullName];
+  if(diagEntry.phone) d.phone = diagEntry.phone;
+  if(diagEntry.bizInfo) d.bizInfo = diagEntry.bizInfo;
+  
+  const diagParts = [];
+  if(diagEntry.strengths) diagParts.push('✅ СИЛЬНЫЕ СТОРОНЫ:\n' + diagEntry.strengths);
+  if(diagEntry.problems) diagParts.push('⚠️ ПРОБЛЕМЫ:\n' + diagEntry.problems);
+  if(diagEntry.top3) diagParts.push('🔥 ТОП-3 ПРОБЛЕМЫ:\n' + diagEntry.top3);
+  if(diagEntry.revenue) diagParts.push('💰 Годовой оборот: ' + diagEntry.revenue);
+  if(diagEntry.profit) diagParts.push('📈 Годовая прибыль: ' + diagEntry.profit);
+  if(diagEntry.helpNeeded) diagParts.push('🆘 Нужна помощь: ' + diagEntry.helpNeeded);
+  if(diagParts.length) d.diagnosis = diagParts.join('\n\n');
+  
+  const planParts = [];
+  if(diagEntry.opportunities) planParts.push('🚀 ВОЗМОЖНОСТИ РОСТА:\n' + diagEntry.opportunities);
+  if(diagEntry.obstacles) planParts.push('🚧 ЧТО МЕШАЕТ:\n' + diagEntry.obstacles);
+  if(diagEntry.programGoal) planParts.push('🎯 ЦЕЛЬ В ПРОГРАММЕ:\n' + diagEntry.programGoal);
+  if(planParts.length && !d.plan) d.plan = planParts.join('\n\n');
+  
+  if(diagEntry.diagScores) d.diagScores = diagEntry.diagScores;
+  if(!d.stages) d.stages = [];
+  if(!d.stages.includes('Анкета заполнена')) d.stages.push('Анкета заполнена');
+}
+
+function importDiagnosticsFromData() {
+  let imported = 0;
+  Object.entries(DIAG_DATA).forEach(([rawName, diagEntry]) => {
+    const matched = matchMentee(rawName);
+    if(!matched) return;
+    applyDiagData(diagEntry, matched.name);
+    imported++;
+  });
+  save();
+  renderMentees();
+  const statusEl = document.getElementById('import-status');
+  statusEl.style.display = 'block';
+  statusEl.innerHTML = `<div style="font-size:13px">✅ Импортировано данных диагностики: <strong>${imported}</strong> участников. Данные заполнены в карточках менти.</div>`;
+  setTimeout(() => statusEl.style.display='none', 4000);
+}
+
+async function importDiagnostics(input){
+  const file=input.files[0];if(!file)return;
+  const statusEl=document.getElementById('import-status');
+  statusEl.style.display='block';
+  statusEl.innerHTML='<p style="font-size:13px;color:var(--t2)">⏳ Читаем файл...</p>';
+  try{
+    if(!window.XLSX){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    }
+    const data=await file.arrayBuffer();
+    const wb=XLSX.read(data,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+    let imported=0,notFound=[];
+    rows.forEach(row=>{
+      const rawName=String(row['ФИО предпринимателя']||'').trim();
+      if(!rawName)return;
+      const matched=matchMentee(rawName);
+      if(!matched){notFound.push(rawName);return;}
+      const safe=v=>{const s=String(v||'').trim();return s==='nan'||s==='None'?'':s;};
+      const diagEntry={
+        phone:safe(row['Номер телефона']),
+        bizInfo:safe(row['Чем занимается ваш бизнес?']),
+        revenue:safe(row['Годовой оборот (Выручка годовая), в сомах']),
+        profit:safe(row['Годовая прибыль (доходы за вычетом расходов), в сомах']),
+        strengths:safe(row['Сильные стороны вашего бизнеса']),
+        problems:safe(row['Основные проблемы бизнеса']),
+        top3:safe(row['Какие 3 проблемы сейчас самые важные?']),
+        opportunities:safe(row['Какие возможности роста вы видите?']),
+        obstacles:safe(row['Что мешает развитию бизнеса?']),
+        helpNeeded:safe(row['В чем вам больше всего нужна помощь?']),
+        programGoal:safe(row['Что вы хотите получить от участия в программе?'])
+      };
+      applyDiagData(diagEntry, matched.name);
+      imported++;
+    });
+    save();renderMentees();
+    let msg=`✅ Импортировано: <strong>${imported}</strong> участников.`;
+    if(notFound.length)msg+=`<br>⚠️ Не найдены: ${notFound.join(', ')}`;
+    statusEl.innerHTML=`<div style="font-size:13px">${msg}</div>`;
+  }catch(e){
+    statusEl.innerHTML=`<p style="font-size:13px;color:var(--red)">Ошибка чтения файла. Попробуйте ещё раз.</p>`;
+  }
+  input.value='';
+}
+
+
+
+// ============ VOICE ASSISTANT ============
+let recognition=null;
+let voiceActive=false;
+let currentVoiceText='';
+
+function toggleVoice(){
+  const panel=document.getElementById('voice-panel');
+  if(panel.style.display==='none'){
+    panel.style.display='block';
+    document.getElementById('voice-btn').style.background='#FBEAF0';
+    document.getElementById('voice-btn').style.color='#993556';
+  } else {
+    closeVoice();
+  }
+}
+
+function closeVoice(){
+  document.getElementById('voice-panel').style.display='none';
+  document.getElementById('voice-btn').style.background='';
+  if(recognition)recognition.stop();
+}
+
+function startListening(){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    document.getElementById('voice-status').textContent='❌ Браузер не поддерживает голос. Используй Chrome.';
+    return;
+  }
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SpeechRecognition();
+  recognition.lang='ru-RU';
+  recognition.continuous=false;
+  recognition.interimResults=true;
+
+  const btn=document.getElementById('voice-start-btn');
+  btn.textContent='🔴 Слушаю...';
+  btn.style.background='#E24B4A';
+  document.getElementById('voice-status').textContent='Говорите...';
+  document.getElementById('voice-text').textContent='';
+  document.getElementById('voice-result').textContent='';
+  document.getElementById('voice-process-btn').style.display='none';
+
+  recognition.onresult=e=>{
+    let interim='';
+    let final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    document.getElementById('voice-text').textContent=final||interim;
+    if(final)currentVoiceText=final;
+  };
+
+  recognition.onend=()=>{
+    btn.textContent='🎤 Говори';
+    btn.style.background='';
+    if(currentVoiceText){
+      document.getElementById('voice-status').textContent='Понял! Обрабатываю...';
+      document.getElementById('voice-process-btn').style.display='block';
+      processVoiceText();
+    } else {
+      document.getElementById('voice-status').textContent='Ничего не услышал. Попробуй ещё.';
+    }
+  };
+
+  recognition.onerror=e=>{
+    btn.textContent='🎤 Говори';
+    btn.style.background='';
+    document.getElementById('voice-status').textContent='Ошибка: '+e.error+'. Попробуй ещё.';
+  };
+
+  recognition.start();
+}
+
+async function processVoiceText(){
+  const text=currentVoiceText||document.getElementById('voice-text').textContent;
+  if(!text.trim())return;
+
+  document.getElementById('voice-status').textContent='⏳ Анализирую команду...';
+  document.getElementById('voice-result').textContent='';
+
+  const today=new Date().toISOString().split('T')[0];
+  const menteeNames=MENTEES_DATA.map(m=>m.name+' (короткое: '+m.short+')').join(', ');
+
+  const prompt=`Ты помощник ментора. Разбери голосовую команду и верни JSON.
+
+Сегодня: ${today}
+Менти: ${menteeNames}
+
+Команда: "${text}"
+
+Верни ТОЛЬКО JSON (без markdown) одного из форматов:
+
+1. Событие в календарь:
+{"action":"event","date":"YYYY-MM-DD","time":"HH:MM","timeEnd":"HH:MM","type":"meeting|visit|call|deadline|other","mentee":"полное имя или all","desc":"описание","place":"место или пусто"}
+
+2. Задача:
+{"action":"task","text":"текст задачи","mentee":"полное имя или all или group","due":"YYYY-MM-DD или пусто","priority":"high|normal|low"}
+
+3. Запись в таймшит:
+{"action":"time","date":"YYYY-MM-DD","hours":1.5,"type":"diag|train|consult|visit|meeting|report|prep","mentee":"имя или all","desc":"описание"}
+
+4. Непонятно:
+{"action":"unknown","message":"что именно непонятно"}
+
+Типы событий: meeting=встреча/тренинг, visit=выезд, call=звонок/консультация, deadline=дедлайн
+Если сказано "всем" или "всем менти" — mentee="group" для задачи, "all" для события
+Определи дату из контекста (сегодня, завтра, в пятницу, 15 июня и т.д.)`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:500,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await resp.json();
+    const raw=data.content?.[0]?.text||'{}';
+    let cmd;
+    try{cmd=JSON.parse(raw.replace(/```json|```/g,'').trim());}
+    catch{cmd={action:'unknown',message:'Не удалось разобрать ответ'};}
+    executeVoiceCommand(cmd,text);
+  }catch(e){
+    document.getElementById('voice-status').textContent='Ошибка API. Проверь интернет.';
+  }
+}
+
+function executeVoiceCommand(cmd,originalText){
+  const res=document.getElementById('voice-result');
+  if(cmd.action==='event'){
+    const ev={
+      id:Date.now().toString(),
+      date:cmd.date,
+      time:cmd.time||'10:00',
+      timeEnd:cmd.timeEnd||'',
+      hours:cmd.timeEnd?((parseInt(cmd.timeEnd)-parseInt(cmd.time||0))||1):1,
+      type:cmd.type||'meeting',
+      mentee:cmd.mentee||'all',
+      desc:cmd.desc||originalText,
+      place:cmd.place||'',
+      done:false
+    };
+    events.push(ev);
+    save();
+    const gcLink=makeGCalLink(ev);
+    res.innerHTML=`✅ Событие добавлено в календарь!<br>
+      <strong>${ev.desc}</strong><br>
+      📅 ${new Date(ev.date).toLocaleDateString('ru-RU',{day:'numeric',month:'long'})} ${ev.time}<br>
+      👤 ${ev.mentee==='all'?'Все менти':ev.mentee}<br>
+      <a href="${gcLink}" target="_blank" style="color:#4285F4;font-size:12px">📅 Добавить в Google Calendar</a>`;
+    res.style.color='#27500A';
+    document.getElementById('voice-status').textContent='✓ Выполнено!';
+    if(document.getElementById('page-calendar').classList.contains('active'))renderCalendar();
+    renderOverview();
+  }
+  else if(cmd.action==='task'){
+    if(cmd.mentee==='group'){
+      MENTEES_DATA.forEach(m=>{
+        tasks.push({id:Date.now().toString()+'_'+m.short,text:cmd.text,done:false,mentee:m.name,due:cmd.due||'',priority:cmd.priority||'normal',isGroup:true});
+      });
+      res.innerHTML=`✅ Групповое задание добавлено всем 7 менти!<br><strong>${cmd.text}</strong>`;
+    } else {
+      const m=MENTEES_DATA.find(x=>x.name===cmd.mentee||x.short===cmd.mentee||cmd.mentee==='all');
+      tasks.push({id:Date.now().toString(),text:cmd.text,done:false,mentee:cmd.mentee||'all',due:cmd.due||'',priority:cmd.priority||'normal'});
+      res.innerHTML=`✅ Задача добавлена!<br><strong>${cmd.text}</strong><br>👤 ${cmd.mentee==='all'?'Общая':cmd.mentee}${cmd.due?'<br>📅 до '+new Date(cmd.due).toLocaleDateString('ru-RU',{day:'numeric',month:'long'}):''}`;
+    }
+    res.style.color='#27500A';
+    save();
+    document.getElementById('voice-status').textContent='✓ Выполнено!';
+    if(document.getElementById('page-tasks').classList.contains('active'))renderTasks();
+    renderOverview();
+  }
+  else if(cmd.action==='time'){
+    timeEntries.push({id:Date.now().toString(),date:cmd.date,hours:cmd.hours||1,type:cmd.type||'meeting',mentee:cmd.mentee||'all',desc:cmd.desc||originalText});
+    save();
+    res.innerHTML=`✅ Запись в таймшит добавлена!<br><strong>${TIME_TYPES[cmd.type]||cmd.type}</strong><br>⏱ ${cmd.hours} ч · ${new Date(cmd.date).toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}`;
+    res.style.color='#27500A';
+    document.getElementById('voice-status').textContent='✓ Выполнено!';
+    if(document.getElementById('page-timesheet').classList.contains('active'))renderTimesheet();
+  }
+  else{
+    res.innerHTML=`❓ Не понял команду: ${cmd.message||'попробуй сформулировать иначе'}<br><small style="color:var(--t2)">Ты сказал: "${originalText}"</small>`;
+    res.style.color='var(--amber)';
+    document.getElementById('voice-status').textContent='Попробуй ещё раз';
+  }
+  currentVoiceText='';
+}
+
+// ============ INIT ============
+load();
+loadScores();
+
+// Автоматически заполняем данные диагностики при первом открытии
+if(!localStorage.getItem('zw_diag_imported')){
+  Object.entries(DIAG_DATA).forEach(([rawName, diagEntry])=>{
+    const matched=matchMentee(rawName);
+    if(matched)applyDiagData(diagEntry, matched.name);
+  });
+  save();
+  localStorage.setItem('zw_diag_imported','1');
+}
+
+renderOverview();
+const todayStr=new Date().toISOString().split('T')[0];
+document.getElementById('ts-date').value=todayStr;
+document.getElementById('ev-date').value=todayStr;
+document.getElementById('ev-time-end').value='11:00';
+calcDuration();
+</script>
+</body>
+</html>
