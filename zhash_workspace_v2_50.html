@@ -150,12 +150,14 @@ textarea{resize:vertical;min-height:80px}
     <button class="btn-o" onclick="processVoiceText()" id="voice-process-btn" style="display:none">✓ Выполнить</button>
   </div>
   <div id="voice-result" style="font-size:13px;min-height:20px"></div>
-  <div style="margin-top:10px;font-size:11px;color:var(--t2);line-height:1.6">
+  <div style="margin-top:10px;font-size:11px;color:var(--t2);line-height:1.8">
     <strong>Примеры команд:</strong><br>
-    "Добавь встречу с Майрам в пятницу в 10 утра"<br>
-    "Задание Бактияру — сделать отчёт до 15 июня"<br>
+    "Встреча с Майрам 9 июня в 10 утра"<br>
+    "Едем к Бактияру 12 июня выезд"<br>
+    "Задание Насыят сделать финансовый отчёт"<br>
+    "Задание всем менти подготовить презентацию"<br>
     "Запиши 2 часа консультации с Азаматом сегодня"<br>
-    "Добавь задачу всем — подготовить презентацию"
+    "Запиши 3 часа тренинга завтра"
   </div>
 </div>
 
@@ -2428,60 +2430,135 @@ function startListening(){
   recognition.start();
 }
 
-async function processVoiceText(){
-  const text=currentVoiceText||document.getElementById('voice-text').textContent;
-  if(!text.trim())return;
+function processVoiceText(){
+  const text=(currentVoiceText||document.getElementById('voice-text').textContent).trim().toLowerCase();
+  if(!text)return;
 
-  document.getElementById('voice-status').textContent='⏳ Анализирую команду...';
+  document.getElementById('voice-status').textContent='⏳ Анализирую...';
   document.getElementById('voice-result').textContent='';
 
-  const today=new Date().toISOString().split('T')[0];
-  const menteeNames=MENTEES_DATA.map(m=>m.name+' (короткое: '+m.short+')').join(', ');
+  const cmd=parseVoiceCommand(text);
+  executeVoiceCommand(cmd,text);
+}
 
-  const prompt=`Ты помощник ментора. Разбери голосовую команду и верни JSON.
+function parseVoiceCommand(text){
+  const today=new Date();
+  const t=text.toLowerCase();
 
-Сегодня: ${today}
-Менти: ${menteeNames}
-
-Команда: "${text}"
-
-Верни ТОЛЬКО JSON (без markdown) одного из форматов:
-
-1. Событие в календарь:
-{"action":"event","date":"YYYY-MM-DD","time":"HH:MM","timeEnd":"HH:MM","type":"meeting|visit|call|deadline|other","mentee":"полное имя или all","desc":"описание","place":"место или пусто"}
-
-2. Задача:
-{"action":"task","text":"текст задачи","mentee":"полное имя или all или group","due":"YYYY-MM-DD или пусто","priority":"high|normal|low"}
-
-3. Запись в таймшит:
-{"action":"time","date":"YYYY-MM-DD","hours":1.5,"type":"diag|train|consult|visit|meeting|report|prep","mentee":"имя или all","desc":"описание"}
-
-4. Непонятно:
-{"action":"unknown","message":"что именно непонятно"}
-
-Типы событий: meeting=встреча/тренинг, visit=выезд, call=звонок/консультация, deadline=дедлайн
-Если сказано "всем" или "всем менти" — mentee="group" для задачи, "all" для события
-Определи дату из контекста (сегодня, завтра, в пятницу, 15 июня и т.д.)`;
-
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:500,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const data=await resp.json();
-    const raw=data.content?.[0]?.text||'{}';
-    let cmd;
-    try{cmd=JSON.parse(raw.replace(/```json|```/g,'').trim());}
-    catch{cmd={action:'unknown',message:'Не удалось разобрать ответ'};}
-    executeVoiceCommand(cmd,text);
-  }catch(e){
-    document.getElementById('voice-status').textContent='Ошибка API. Проверь интернет.';
+  // ---- Определяем дату ----
+  function parseDate(txt){
+    const months={
+      'января':0,'февраля':1,'марта':2,'апреля':3,'мая':4,'июня':5,
+      'июля':6,'августа':7,'сентября':8,'октября':9,'ноября':10,'декабря':11
+    };
+    // "9 июня", "15 июля" и т.д.
+    const dmMatch=txt.match(/(\d{1,2})\s+(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)/);
+    if(dmMatch){
+      const d=new Date(2026,months[dmMatch[2]],parseInt(dmMatch[1]));
+      return d.toISOString().split('T')[0];
+    }
+    if(txt.includes('сегодня'))return today.toISOString().split('T')[0];
+    if(txt.includes('завтра')){const d=new Date(today);d.setDate(d.getDate()+1);return d.toISOString().split('T')[0];}
+    const days={понедельник:1,вторник:2,среда:3,четверг:4,пятница:5,суббота:6,воскресенье:0};
+    for(const[day,num] of Object.entries(days)){
+      if(txt.includes(day)){
+        const d=new Date(today);
+        const diff=(num-d.getDay()+7)%7||7;
+        d.setDate(d.getDate()+diff);
+        return d.toISOString().split('T')[0];
+      }
+    }
+    return today.toISOString().split('T')[0];
   }
+
+  // ---- Определяем время ----
+  function parseTime(txt){
+    const m=txt.match(/(\d{1,2})(?::(\d{2}))?\s*(?:утра|дня|вечера|час|часов|ч\.?)?/);
+    if(m){
+      let h=parseInt(m[1]);
+      const min=m[2]?parseInt(m[2]):0;
+      if(txt.includes('вечера')&&h<12)h+=12;
+      if(txt.includes('дня')&&h<12)h+=12;
+      return String(h).padStart(2,'0')+':'+String(min).padStart(2,'0');
+    }
+    return '10:00';
+  }
+
+  // ---- Определяем менти ----
+  function parseMentee(txt){
+    for(const m of MENTEES_DATA){
+      if(txt.includes(m.short.toLowerCase())||txt.includes(m.name.toLowerCase().split(' ')[0]))
+        return m.name;
+    }
+    if(txt.includes('всем менти')||txt.includes('все менти')||txt.includes('всем'))return 'group';
+    return 'all';
+  }
+
+  // ---- Определяем часы ----
+  function parseHours(txt){
+    const m=txt.match(/(\d+(?:[.,]\d+)?)\s*(?:час|ч\.?)/);
+    return m?parseFloat(m[1].replace(',','.')):1;
+  }
+
+  const date=parseDate(t);
+  const mentee=parseMentee(t);
+
+  // СОБЫТИЕ
+  const isEvent=t.includes('встреч')||t.includes('добавь в календарь')||
+    t.includes('запланируй')||t.includes('тренинг')||t.includes('выезд')||
+    t.includes('едем')||t.includes('едем к')||t.includes('звонок')||t.includes('консультац');
+  if(isEvent){
+    let type='meeting';
+    if(t.includes('выезд')||t.includes('едем к')||t.includes('едем на'))type='visit';
+    else if(t.includes('звонок')||t.includes('консультац'))type='call';
+    else if(t.includes('тренинг'))type='meeting';
+    const time=parseTime(t);
+    const timeEnd=`${String(parseInt(time.split(':')[0])+2).padStart(2,'0')}:${time.split(':')[1]}`;
+
+    // Описание — убираем служебные слова
+    let desc=t.replace(/добавь|в календарь|запланируй|встречу|встреча|выезд|тренинг|звонок|консультацию|сегодня|завтра|в понедельник|во вторник|в среду|в четверг|в пятницу|в субботу|в воскресенье|\d{1,2}\s+(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)|\d{1,2}\s+утра|\d{1,2}\s+вечера|\d{1,2}\s+часов/gi,'').trim();
+    for(const m of MENTEES_DATA){
+      desc=desc.replace(new RegExp(m.short.toLowerCase(),'gi'),'').replace(new RegExp(m.name.toLowerCase().split(' ')[0],'gi'),'').trim();
+    }
+    if(!desc||desc.length<3){
+      if(type==='visit')desc='Выезд к '+((mentee!=='all'&&mentee!=='group')?mentee:'менти');
+      else if(type==='call')desc='Консультация '+(mentee!=='all'&&mentee!=='group'?'с '+mentee:'');
+      else desc='Встреча '+(mentee!=='all'&&mentee!=='group'?'с '+mentee:'');
+    }
+    return{action:'event',date,time,timeEnd,type,mentee:mentee==='group'?'all':mentee,desc:desc.trim()};
+  }
+
+  // ТАЙМШИТ
+  const isTime=t.includes('запиши')||t.includes('записать')||t.includes('часа')||
+    t.includes('часов')||t.includes('потратила')||t.includes('потратил')||t.includes('таймшит');
+  if(isTime){
+    let type='meeting';
+    if(t.includes('диагностик'))type='diag';
+    else if(t.includes('тренинг'))type='train';
+    else if(t.includes('консультац'))type='consult';
+    else if(t.includes('выезд')||t.includes('поездк'))type='visit';
+    else if(t.includes('отчёт')||t.includes('отчет')||t.includes('документ'))type='report';
+    else if(t.includes('подготов'))type='prep';
+    const hours=parseHours(t);
+    return{action:'time',date,hours,type,mentee:mentee==='group'?'all':mentee,desc:''};
+  }
+
+  // ЗАДАЧА
+  const isTask=t.includes('задан')||t.includes('задач')||t.includes('сделать')||
+    t.includes('поручить')||t.includes('напомни')||t.includes('надо');
+  if(isTask){
+    // Извлекаем текст задачи
+    let taskText=t.replace(/задание|задачу|задача|добавь|создай|поручить|надо|сделать/gi,'').trim();
+    for(const m of MENTEES_DATA){
+      taskText=taskText.replace(new RegExp(m.short.toLowerCase(),'gi'),'').replace(new RegExp(m.name.toLowerCase().split(' ')[0],'gi'),'').trim();
+    }
+    taskText=taskText.replace(/^(для|для всех|всем|до|к)\s*/i,'').trim();
+    if(!taskText)taskText='Задание';
+    const priority=t.includes('срочно')||t.includes('важно')?'high':'normal';
+    return{action:'task',text:taskText,mentee,due:date,priority};
+  }
+
+  return{action:'unknown',message:'Попробуй: "Встреча с Майрам 9 июня в 10 утра" или "Задание Бактияру сделать отчёт" или "Запиши 2 часа консультации с Азаматом"'};
 }
 
 function executeVoiceCommand(cmd,originalText){
