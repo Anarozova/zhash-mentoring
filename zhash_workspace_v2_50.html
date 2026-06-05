@@ -1291,6 +1291,25 @@ function toggleEventDone(id){
   save();renderCalendar();renderOverview();
 }
 
+function editEvent(id){
+  const ev=events.find(e=>e.id===id);
+  if(!ev)return;
+  // Scroll to form and fill it
+  document.getElementById('add-event-form').style.display='block';
+  document.getElementById('ev-form-title').textContent='Редактировать событие';
+  document.getElementById('ev-edit-id').value=id;
+  document.getElementById('ev-date').value=ev.date;
+  document.getElementById('ev-time').value=ev.time||'10:00';
+  document.getElementById('ev-time-end').value=ev.timeEnd||'11:00';
+  document.getElementById('ev-type').value=ev.type||'meeting';
+  document.getElementById('ev-mentee').value=ev.mentee||'all';
+  document.getElementById('ev-desc').value=ev.desc||'';
+  document.getElementById('ev-place').value=ev.place||'';
+  document.getElementById('ev-ok').textContent='';
+  calcDuration();
+  document.getElementById('add-event-form').scrollIntoView({behavior:'smooth'});
+}
+
 function deleteEvent(id){events=events.filter(e=>e.id!==id);save();renderCalendar();renderOverview();}
 
 function renderEventsList(){
@@ -1306,6 +1325,7 @@ function renderEventsList(){
       </div>
       <span class="tag" style="background:${TYPE_COLORS[e.type]};color:${TYPE_TEXT[e.type]};white-space:nowrap">${TYPE_NAMES[e.type]||''}</span>
       <a href="${makeGCalLink(e)}" target="_blank" style="display:inline-flex;align-items:center;padding:4px 8px;background:#4285F4;color:#fff;border-radius:var(--rm);font-size:11px;text-decoration:none;white-space:nowrap" title="Добавить в Google Calendar">📅</a>
+      <button class="btn-o btn-sm" onclick="editEvent('${e.id}')" style="white-space:nowrap">✏️</button>
       <button class="${e.done?'btn-o btn-sm':'btn-green btn-sm'}" onclick="toggleEventDone('${e.id}')" style="white-space:nowrap">${e.done?'↩ Вернуть':'✓ Проведено'}</button>
       <button class="btn-red" onclick="deleteEvent('${e.id}')">✕</button>
     </div>`).join('');
