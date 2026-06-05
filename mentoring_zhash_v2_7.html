@@ -184,11 +184,12 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(24,9
   <!-- Plan Tab -->
   <div id="me-tab-plan" style="display:none">
     <div class="stitle">Мой план действий</div>
-    <div style="font-size:13px;color:var(--t2);margin-bottom:1rem">Заполни свой план — ментор видит его в рабочем пространстве</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:1.25rem">Заполни свой план — ментор видит его в рабочем пространстве</div>
     <div id="me-plan-rows"></div>
     <div style="margin-bottom:1rem;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn" onclick="addMyPlanRow()">+ Добавить строку</button>
+      <button class="btn" onclick="addMyPlanActivity()">+ Деятельность</button>
       <button class="btn-o" onclick="saveMyPlan()" id="me-plan-save-btn">💾 Сохранить план</button>
+      <button class="btn-o" onclick="downloadMyPlan()" style="color:#1D9E75;border-color:rgba(29,158,117,.4)">📄 Скачать план</button>
       <span id="me-plan-ok" style="font-size:13px;color:#3B6D11;align-self:center"></span>
     </div>
   </div>
@@ -200,6 +201,7 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(24,9
     <div id="me-diag-form"></div>
     <div style="margin-top:1rem;display:flex;gap:8px">
       <button class="btn" onclick="saveMyDiag()" id="me-diag-save-btn">💾 Сохранить ответы</button>
+      <button class="btn-o" onclick="downloadMyDiag()" style="color:#1D9E75;border-color:rgba(29,158,117,.4)">📄 Скачать диагностику</button>
       <span id="me-diag-ok" style="font-size:13px;color:#3B6D11;align-self:center"></span>
     </div>
   </div>
@@ -504,7 +506,13 @@ function loginMentee(){if(!selMentee){document.getElementById('meerr').textConte
 function logout(){currentRole=null;selMentee=null;stopPoll();Object.values(charts).forEach(c=>{try{c.destroy();}catch{}});charts={};document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s-login').classList.add('active');document.getElementById('mpin').value='';document.getElementById('merr').textContent='';document.getElementById('meerr').textContent='';document.getElementById('mentee-sel').value='';document.getElementById('pinstep').style.display='none';}
 function sw(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-function showMentee(name){currentRole='mentee';selMentee=name;sw('s-mentee');setBadge(false);renderMentee(name);startPoll();}
+function showMentee(name){currentRole='mentee';selMentee=name;sw('s-mentee');setBadge(false);
+  // Сбрасываем план при смене менти
+  const planRows=document.getElementById('me-plan-rows');
+  if(planRows){planRows.innerHTML='';delete planRows.dataset.loaded;}
+  myPlan=[];
+  renderMentee(name);startPoll();
+}
 
 function renderMentee(name){
   const t=totals(name);const ic=iterCount(name);const maxP=ic*20;
@@ -534,12 +542,18 @@ function renderMentee(name){
   const cb=document.getElementById('me-bar');
   if(cb)charts['mb']=new Chart(cb,{type:'bar',data:{labels:CATS,datasets:[{label:'Баллов',data:[t.att,t.hw,t.act,t.res],backgroundColor:CCOL,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#888'}},x:{grid:{display:false},ticks:{color:'#888'}}}}});
   renderFeed(name);
-  renderActionPlan(name);
+  // Plan загружается только один раз при входе — не перерисовываем при каждом poll
+  if(!document.querySelector('#me-plan-rows .plan-activity-block')&&!document.getElementById('me-plan-rows').dataset.loaded){
+    document.getElementById('me-plan-rows').dataset.loaded='1';
+    renderActionPlan(name);
+  }
 }
 
 function renderActionPlan(name){
-  const el=document.getElementById('me-action-plan');
-  if(!el)return;
+  const container=document.getElementById('me-plan-rows');
+  if(!container)return;
+  // Don't re-render if mentee is actively editing
+  if(container.querySelector('input:focus, textarea:focus'))return;
   // Load from Firebase
   fetch(FB+'/data/mdetails/'+encodeURIComponent(name)+'/actionPlan.json?t='+Date.now())
     .then(r=>r.ok?r.json():null)
@@ -552,79 +566,197 @@ function renderActionPlan(name){
 
 let planRowCount=0;
 
-function addMyPlanRow(){
+// myPlan structure: [{activity:'', indicator:'', budget:'', deadline:'', subActivities:[{text:'',indicator:'',budget:'',deadline:''}]}]
+
+function addMyPlanActivity(data={}){
   document.getElementById('me-tab-progress').style.display='none';
   document.getElementById('me-tab-plan').style.display='block';
   document.getElementById('me-tab-diag').style.display='none';
   document.querySelectorAll('.tabs .btn-o').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('.tabs .btn-o')[1]?.classList.add('on');
-  const i=planRowCount++;
-  const row=document.createElement('div');
-  row.id='plan-row-'+i;
-  row.style.cssText='background:#fff;border:0.5px solid rgba(28,28,26,.12);border-radius:12px;padding:1rem;margin-bottom:10px';
-  row.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:10px">
-    <span style="font-size:12px;font-weight:500;color:#5f5e5a">Строка ${i+1}</span>
-    <button onclick="document.getElementById('plan-row-${i}').remove()" style="background:none;border:none;color:#E24B4A;cursor:pointer">✕ Удалить</button>
-  </div>
-  <div style="margin-bottom:8px"><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Деятельность</label>
-    <input type="text" name="act-${i}" placeholder="Что буду делать..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
-  <div style="margin-bottom:8px"><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Индикатор</label>
-    <input type="text" name="ind-${i}" placeholder="Как измерю результат..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-    <div><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Бюджет/Ресурсы</label>
-      <input type="text" name="bud-${i}" placeholder="Ресурсы..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
-    <div><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Срок</label>
-      <input type="text" name="dead-${i}" placeholder="Когда..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
-  </div>`;
-  document.getElementById('me-plan-rows').appendChild(row);
+
+  const actNum=document.querySelectorAll('#me-plan-rows .plan-activity-block').length+1;
+  const block=document.createElement('div');
+  block.className='plan-activity-block';
+  const isDone=data.done||false;
+  block.style.cssText='background:'+(isDone?'#EAF3DE':'#fff')+';border:0.5px solid '+(isDone?'rgba(29,158,117,.3)':'rgba(24,95,165,.2)')+';border-radius:12px;padding:1rem;margin-bottom:12px';
+
+  // Header row
+  const hdr=document.createElement('div');
+  hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px';
+
+  const left=document.createElement('div');left.style.cssText='display:flex;align-items:center;gap:8px';
+  const num=document.createElement('span');num.className='act-num';
+  num.style.cssText='background:#185FA5;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0';
+  num.textContent=actNum;
+  const ttl=document.createElement('span');ttl.style.cssText='font-size:13px;font-weight:500;color:#185FA5';ttl.textContent='Деятельность '+actNum;
+  left.appendChild(num);left.appendChild(ttl);
+
+  const right=document.createElement('div');right.style.cssText='display:flex;align-items:center;gap:8px';
+
+  // Done checkbox
+  const chk=document.createElement('input');
+  chk.type='checkbox';chk.checked=isDone;chk.className='act-done-chk';
+  chk.style.cssText='width:18px;height:18px;cursor:pointer;accent-color:#1D9E75;flex-shrink:0';
+  const doneSpan=document.createElement('span');
+  doneSpan.style.cssText='font-size:12px;cursor:pointer;color:'+(isDone?'#27500A':'#5f5e5a');
+  doneSpan.textContent=isDone?'✓ Выполнено':'Выполнено?';
+  const toggleDone=()=>{
+    const d=chk.checked;
+    block.style.background=d?'#EAF3DE':'#fff';
+    block.style.borderColor=d?'rgba(29,158,117,.3)':'rgba(24,95,165,.2)';
+    doneSpan.textContent=d?'✓ Выполнено':'Выполнено?';
+    doneSpan.style.color=d?'#27500A':'#5f5e5a';
+  };
+  chk.onchange=toggleDone;
+  doneSpan.onclick=()=>{chk.checked=!chk.checked;toggleDone();};
+  right.appendChild(chk);right.appendChild(doneSpan);
+
+  const del=document.createElement('button');del.textContent='✕';
+  del.style.cssText='background:none;border:none;color:#E24B4A;cursor:pointer;font-size:14px;margin-left:4px';
+  del.onclick=()=>{block.remove();renumberActivities();};
+  right.appendChild(del);
+
+  hdr.appendChild(left);hdr.appendChild(right);
+  block.appendChild(hdr);
+
+  // Only activity name field
+  const actInp=document.createElement('input');
+  actInp.type='text';actInp.placeholder='Название деятельности...';actInp.value=data.activity||'';
+  actInp.className='act-name-inp';
+  actInp.style.cssText='width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit;font-weight:500;margin-bottom:10px';
+  block.appendChild(actInp);
+
+  // Sub-activities list
+  const subList=document.createElement('div');subList.className='sub-activities-list';
+  block.appendChild(subList);
+
+  // Add sub-activity button
+  const addBtn=document.createElement('button');
+  addBtn.textContent='+ Под-деятельность';
+  addBtn.style.cssText='background:none;border:0.5px dashed rgba(24,95,165,.4);border-radius:8px;padding:7px 12px;font-size:12px;color:#185FA5;cursor:pointer;width:100%;font-family:inherit;margin-top:4px';
+  addBtn.onclick=()=>addSubActivityEl(subList,actNum,{});
+  block.appendChild(addBtn);
+
+  document.getElementById('me-plan-rows').appendChild(block);
+  if(data.subActivities&&data.subActivities.length){
+    data.subActivities.forEach(s=>addSubActivityEl(subList,actNum,s));
+  }
+}
+
+function makeSubInp(ph,val,bold){
+  const i=document.createElement('input');
+  i.type='text';i.placeholder=ph;i.value=val||'';
+  i.style.cssText='width:100%;padding:7px 10px;border:0.5px solid rgba(28,28,26,.2);border-radius:6px;font-size:13px;font-family:inherit;background:#fff'+(bold?';font-weight:500':'');
+  return i;
+}
+function makeSubLabel(txt){
+  const l=document.createElement('div');
+  l.style.cssText='font-size:10px;color:#5f5e5a;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em';
+  l.textContent=txt;return l;
+}
+function makeSubField(lbl,ph,val,bold){
+  const w=document.createElement('div');
+  w.appendChild(makeSubLabel(lbl));w.appendChild(makeSubInp(ph,val,bold));return w;
+}
+
+function addSubActivityEl(subList,actNum,data){
+  const subNum=subList.querySelectorAll('.sub-activity-item').length+1;
+  const item=document.createElement('div');
+  item.className='sub-activity-item';
+  const isDone=data.done||false;
+  item.style.cssText='background:'+(isDone?'#EAF3DE':'#F8F7F4')+';border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid '+(isDone?'#1D9E75':'#185FA5');
+
+  const shdr=document.createElement('div');
+  shdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:8px';
+  const sleft=document.createElement('div');sleft.style.cssText='display:flex;align-items:center;gap:6px';
+  const snum=document.createElement('span');
+  snum.style.cssText='background:#E6F1FB;color:#0C447C;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:500';
+  snum.textContent=actNum+'.'+subNum;
+  const stitle=document.createElement('span');
+  stitle.style.cssText='font-size:12px;font-weight:500;color:#5f5e5a';
+  stitle.textContent='Под-деятельность';
+  sleft.appendChild(snum);sleft.appendChild(stitle);
+
+  const sright=document.createElement('div');sright.style.cssText='display:flex;align-items:center;gap:6px';
+  const schk=document.createElement('input');
+  schk.type='checkbox';schk.checked=isDone;schk.className='sub-done-chk';
+  schk.style.cssText='width:16px;height:16px;cursor:pointer;accent-color:#1D9E75';
+  const sdoneSpan=document.createElement('span');
+  sdoneSpan.style.cssText='font-size:11px;cursor:pointer;color:'+(isDone?'#27500A':'#5f5e5a');
+  sdoneSpan.textContent=isDone?'✓ Готово':'Готово?';
+  const toggleSub=()=>{
+    const d=schk.checked;
+    item.style.background=d?'#EAF3DE':'#F8F7F4';
+    item.style.borderLeftColor=d?'#1D9E75':'#185FA5';
+    sdoneSpan.textContent=d?'✓ Готово':'Готово?';
+    sdoneSpan.style.color=d?'#27500A':'#5f5e5a';
+  };
+  schk.onchange=toggleSub;
+  sdoneSpan.onclick=()=>{schk.checked=!schk.checked;toggleSub();};
+  const sdel=document.createElement('button');sdel.textContent='✕';
+  sdel.style.cssText='background:none;border:none;color:#E24B4A;cursor:pointer;font-size:12px';
+  sdel.onclick=()=>item.remove();
+  sright.appendChild(schk);sright.appendChild(sdoneSpan);sright.appendChild(sdel);
+  shdr.appendChild(sleft);shdr.appendChild(sright);
+  item.appendChild(shdr);
+
+  const textWrap=makeSubField('Деятельность','Описание деятельности...',data.text,true);
+  textWrap.style.marginBottom='8px';
+  item.appendChild(textWrap);
+
+  const grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px';
+  grid.appendChild(makeSubField('Индикатор','Как измерю...',data.indicator));
+  grid.appendChild(makeSubField('Бюджет','Ресурсы...',data.budget));
+  grid.appendChild(makeSubField('Срок','Когда...',data.deadline));
+  item.appendChild(grid);
+  subList.appendChild(item);
+}
+
+function addSubActivity(parentId,data){
+  const parent=document.getElementById(parentId);
+  if(!parent)return;
+  addSubActivityEl(parent.querySelector('.sub-activities-list'),1,data||{});
+}
+
+function renumberActivities(){
+  document.querySelectorAll('#me-plan-rows .plan-activity-block').forEach((b,i)=>{
+    const n=b.querySelector('.act-num');if(n)n.textContent=i+1;
+    const t=b.querySelector('span.act-num + span');
+    if(t)t.textContent='Деятельность '+(i+1);
+  });
 }
 
 function renderMyPlanTable(){
-  // Load existing plan rows
   const container=document.getElementById('me-plan-rows');
   if(!container)return;
   container.innerHTML='';
-  planRowCount=0;
   if(!myPlan||!myPlan.length)return;
-  myPlan.forEach((row,i)=>{
-    const div=document.createElement('div');
-    div.id='plan-row-'+i;
-    div.style.cssText='background:#fff;border:0.5px solid rgba(28,28,26,.12);border-radius:12px;padding:1rem;margin-bottom:10px';
-    div.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:12px;font-weight:500;color:#5f5e5a">Строка ${i+1}</span>
-      <button onclick="document.getElementById('plan-row-${i}').remove()" style="background:none;border:none;color:#E24B4A;cursor:pointer">✕ Удалить</button>
-    </div>
-    <div style="margin-bottom:8px"><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Деятельность</label>
-      <input type="text" name="act-${i}" value="${(row.activity||'').replace(/"/g,'&quot;')}" placeholder="Что буду делать..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
-    <div style="margin-bottom:8px"><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Индикатор</label>
-      <input type="text" name="ind-${i}" value="${(row.indicator||'').replace(/"/g,'&quot;')}" placeholder="Как измерю результат..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Бюджет/Ресурсы</label>
-        <input type="text" name="bud-${i}" value="${(row.budget||'').replace(/"/g,'&quot;')}" placeholder="Ресурсы..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
-      <div><label style="font-size:11px;color:#5f5e5a;display:block;margin-bottom:4px">Срок</label>
-        <input type="text" name="dead-${i}" value="${(row.deadline||'').replace(/"/g,'&quot;')}" placeholder="Когда..." style="width:100%;padding:9px 12px;border:0.5px solid rgba(28,28,26,.3);border-radius:8px;font-size:14px;font-family:inherit"></div>
-    </div>`;
-    container.appendChild(div);
-    planRowCount=i+1;
-  });
+  myPlan.forEach(row=>addMyPlanActivity(row));
 }
 
 async function saveMyPlan(){
   if(!selMentee)return;
-  // Collect all rows from DOM
+  // Collect all activities from DOM
   const collected=[];
-  const container=document.getElementById('me-plan-rows');
-  if(container){
-    const rows=container.querySelectorAll('[id^="plan-row-"]');
-    rows.forEach(row=>{
-      collected.push({
-        activity:row.querySelector('[name^="act"]')?.value||'',
-        indicator:row.querySelector('[name^="ind"]')?.value||'',
-        budget:row.querySelector('[name^="bud"]')?.value||'',
-        deadline:row.querySelector('[name^="dead"]')?.value||''
+  document.querySelectorAll('#me-plan-rows .plan-activity-block').forEach(block=>{
+    const done=block.querySelector('.act-done-chk')?.checked||false;
+    const activity=block.querySelector('.act-name-inp')?.value||'';
+    const subActivities=[];
+    block.querySelectorAll('.sub-activity-item').forEach(sub=>{
+      const subDone=sub.querySelector('.sub-done-chk')?.checked||false;
+      const inputs=sub.querySelectorAll('input[type="text"]');
+      subActivities.push({
+        text:inputs[0]?.value||'',
+        indicator:inputs[1]?.value||'',
+        budget:inputs[2]?.value||'',
+        deadline:inputs[3]?.value||'',
+        done:subDone
       });
     });
-  }
+    collected.push({activity,done,subActivities});
+  });
   myPlan=collected;
   const btn=document.getElementById('me-plan-save-btn');
   const ok=document.getElementById('me-plan-ok');
@@ -642,6 +774,109 @@ async function saveMyPlan(){
   }
   setTimeout(()=>ok.textContent='',3000);
   btn.textContent='💾 Сохранить план';
+}
+
+function downloadMyPlan(){
+  if(!selMentee||!myPlan.length){
+    alert('Сначала заполни и сохрани план!');return;
+  }
+  const now=new Date().toLocaleDateString('ru-RU');
+  let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="UTF-8"><title>План действий — ${selMentee}</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:11pt;color:#000;margin:2cm}
+    h1{font-size:16pt;color:#185FA5;margin-bottom:4pt}
+    table{width:100%;border-collapse:collapse;margin-bottom:8pt;font-size:10pt}
+    td,th{padding:5pt 8pt;border:1px solid #ccc;vertical-align:top}
+    th{background:#E6F1FB;font-weight:bold;color:#185FA5}
+    .act-row{background:#E6F1FB;font-weight:bold}
+    .sub-row{background:#fafaf8}
+    .num{text-align:center;width:28pt;font-weight:bold;color:#185FA5}
+    .sub-num{text-align:center;width:28pt;color:#888;font-size:9.5pt}
+    .done{color:#27500A}
+  </style></head><body>
+  <h1>План действий</h1>
+  <p style="font-size:10pt;color:#666;margin-bottom:14pt">${selMentee} &nbsp;|&nbsp; Mentoring Zhash Pro &nbsp;|&nbsp; ${now}</p>
+  <table>
+    <tr><th class="num">№</th><th>Деятельность / Активность</th><th>Индикатор</th><th>Бюджет/Ресурсы</th><th>Срок</th><th>Статус</th></tr>`;
+
+  myPlan.forEach((row,i)=>{
+    html+=`<tr class="act-row">
+      <td class="num">${i+1}</td>
+      <td colspan="3"><strong>${row.activity||'—'}</strong></td>
+      <td></td>
+      <td class="${row.done?'done':''}">${row.done?'✓ Выполнено':'В процессе'}</td>
+    </tr>`;
+    if(row.subActivities&&row.subActivities.length){
+      row.subActivities.forEach((sub,j)=>{
+        html+=`<tr class="sub-row">
+          <td class="sub-num">${i+1}.${j+1}</td>
+          <td style="padding-left:16pt">${sub.text||'—'}</td>
+          <td>${sub.indicator||'—'}</td>
+          <td>${sub.budget||'—'}</td>
+          <td>${sub.deadline||'—'}</td>
+          <td class="${sub.done?'done':''}">${sub.done?'✓ Готово':'—'}</td>
+        </tr>`;
+      });
+    }
+  });
+
+  html+=`</table>
+  <p style="font-size:9pt;color:#888;margin-top:20pt">Сформировано: ${now}</p>
+  </body></html>`;
+
+  const blob=new Blob(['\ufeff'+html],{type:'application/msword;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='plan_'+selMentee.split(' ')[0]+'_'+now.replace(/\./g,'-')+'.doc';
+  a.click();
+}
+
+function downloadMyDiag(){
+  if(!selMentee||!Object.keys(myDiagAnswers).length){
+    alert('Сначала заполни и сохрани ответы!');return;
+  }
+  const now=new Date().toLocaleDateString('ru-RU');
+  let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="UTF-8"><title>Диагностика — ${selMentee}</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:11pt;color:#000;margin:2cm}
+    h1{font-size:16pt;color:#185FA5;margin-bottom:4pt}
+    h2{font-size:11pt;color:#185FA5;margin-top:12pt;margin-bottom:4pt;background:#E6F1FB;padding:5pt 8pt}
+    table{width:100%;border-collapse:collapse;margin-bottom:8pt;font-size:10pt}
+    td,th{padding:5pt 8pt;border:1px solid #ccc;vertical-align:top}
+    th{background:#f5f5f3;font-weight:bold;color:#0C447C;width:45%}
+    .empty{color:#999;font-style:italic}
+  </style></head><body>
+  <h1>Диагностика бизнеса</h1>
+  <p style="font-size:10pt;color:#666;margin-bottom:14pt">${selMentee} &nbsp;|&nbsp; Mentoring Zhash Pro &nbsp;|&nbsp; ${now}</p>`;
+
+  DIAG_QUESTIONS.forEach(section=>{
+    const hasAnswers=section.questions.some((_,qi)=>{
+      const key=section.section+'_'+qi;
+      return myDiagAnswers[key]&&myDiagAnswers[key].trim();
+    });
+    if(!hasAnswers)return;
+    html+=`<h2>${section.section}</h2><table>`;
+    section.questions.forEach((q,qi)=>{
+      const key=section.section+'_'+qi;
+      const ans=myDiagAnswers[key]||'';
+      html+=`<tr>
+        <th>${q}</th>
+        <td>${ans?ans.replace(/\n/g,'<br>'):'<span class="empty">Не заполнено</span>'}</td>
+      </tr>`;
+    });
+    html+=`</table>`;
+  });
+
+  html+=`<p style="font-size:9pt;color:#888;margin-top:20pt">Сформировано: ${now}</p>
+  </body></html>`;
+
+  const blob=new Blob(['\ufeff'+html],{type:'application/msword;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='diagnostics_'+selMentee.split(' ')[0]+'_'+now.replace(/\./g,'-')+'.doc';
+  a.click();
 }
 
 function renderFeed(name){
